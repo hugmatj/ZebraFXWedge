@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".FXWedgeSetupActivity">
+
+    <Switch
+        android:id="@+id/startOnBootSwitch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:text="Auto-start after reboot"
+        android:textSize="24sp" />
+
+    <TextView
+        android:id="@+id/tv_serverport"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/startOnBootSwitch"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:text="Server Port: "
+        android:textSize="24sp" />
+
+    <EditText
+        android:id="@+id/et_serverport"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/startOnBootSwitch"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_toLeftOf="@id/tv_serverport"
+        android:layout_toEndOf="@+id/tv_serverport"
+        android:layout_toRightOf="@+id/tv_serverport"
+        android:text="5000"
+        android:textSize="24sp" />
+
+    <TextView
+        android:id="@+id/tv_fxName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/et_serverport"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:text="FX Name: "
+        android:textSize="24sp" />
+
+    <EditText
+        android:id="@+id/et_fxname"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/et_serverport"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_toLeftOf="@id/tv_fxIP"
+        android:layout_toEndOf="@+id/tv_fxIP"
+        android:layout_toRightOf="@+id/tv_fxIP"
+        android:text="FX7500FCDA1B"
+        android:textSize="24sp" />
+
+    <TextView
+        android:id="@+id/tv_fxIP"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_fxName"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:text="FX IP: "
+        android:textSize="24sp" />
+
+    <EditText
+        android:id="@+id/et_fxip"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_fxName"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_toLeftOf="@id/tv_fxIP"
+        android:layout_toEndOf="@+id/tv_fxIP"
+        android:layout_toRightOf="@+id/tv_fxIP"
+        android:text="127.0.0.1"
+        android:textSize="24sp" />
+
+    <TextView
+        android:id="@+id/tv_fxLogin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/et_fxip"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:text="FX Login: "
+        android:textSize="24sp" />
+
+    <EditText
+        android:id="@+id/et_fxlogin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/et_fxip"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_toLeftOf="@id/tv_fxLogin"
+        android:layout_toEndOf="@+id/tv_fxLogin"
+        android:layout_toRightOf="@+id/tv_fxLogin"
+        android:text="admin"
+        android:textSize="24sp" />
+
+
+    <TextView
+        android:id="@+id/tv_fxpassword"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/et_fxlogin"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:text="FX Password: "
+        android:textSize="24sp" />
+
+    <EditText
+        android:id="@+id/et_fxpassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/et_fxlogin"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_toLeftOf="@id/tv_fxpassword"
+        android:layout_toEndOf="@+id/tv_fxpassword"
+        android:layout_toRightOf="@+id/tv_fxpassword"
+        android:text="change"
+        android:textSize="24sp" />
+
+    <Button
+        android:id="@+id/bt_save"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/et_fxpassword"
+        android:layout_marginTop="30dp"
+        android:layout_centerHorizontal="true"
+        android:text="Save Config" />
+</RelativeLayout>

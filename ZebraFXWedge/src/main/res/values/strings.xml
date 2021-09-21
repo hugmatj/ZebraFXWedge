@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Zebra FXWedge</string>
+    <string name="zebra_enterprise_services_notification_title">Zebra FXWedge</string>
+    <string name="zebra_enterprise_services_notification_text">A service that allow to control and use Zebra\'s FX Readers using Intents.</string>
+    <string name="zebra_enterprise_services_notification_tickle">ZebraFXWedge</string>
+    <string name="serviceStopped">Service is stopped</string>
+    <string name="serviceStarted">Service is running</string>
+    <string name="startOnBoot">Start on boot</string>
+    <string name="doNothingOnBoot">Do nothing on boot</string>
+    <string name="zebra_enterprise_services_channel_name">Zebra FXWedge</string>
+    <string name="zebra_enterprise_services_channel_id">Zebra FXWedge channel</string>
+    <string name="zebra_enterprise_services_appdescription"></string>
+    <string name="restconfigactivitytitle">FXWedge Service</string>
+    <string name="iptextviewprefix">Device IP: </string>
+    <string name="configsaved">Configuration saved successfully</string>
+</resources>
