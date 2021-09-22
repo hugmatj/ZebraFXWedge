@@ -8,7 +8,9 @@ import android.util.Log;
 public class FXRestAPIServiceBroadcastReceiverStopReading extends FxRestAPIServiceBroadcastReceiverBase {
     @Override
     public void onReceive(Context context, Intent intent) {
+        mSourceName = RESTHostServiceConstants.FX_INTENT_ACTION_STOP_READING;
         Log.d(FXReaderRESTApiFacade.TAG, "FXRestAPIServiceBroadcastReceiverStopReading::onReceive");
+        mContext = context;
         FXReaderRESTApiFacade fxReaderRESTApiFacade = new FXReaderRESTApiFacade(context);
         fxReaderRESTApiFacade.stopReading(new FXReaderRESTApiFacade.RESTAPICallCallback() {
             @Override

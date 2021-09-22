@@ -8,7 +8,9 @@ import android.util.Log;
 public class FXRestAPIServiceBroadcastReceiverSetup extends FxRestAPIServiceBroadcastReceiverBase {
     @Override
     public void onReceive(Context context, Intent intent) {
+        mSourceName = RESTHostServiceConstants.FX_INTENT_ACTION_SETUP;
         Log.d(FXReaderRESTApiFacade.TAG, "FXRestAPIServiceBroadcastReceiverSetup::onReceive");
+        mContext = context;
         FXReaderRESTApiFacade fxReaderRESTApiFacade = new FXReaderRESTApiFacade(context);
         fxReaderRESTApiFacade.setupFxReader(new FXReaderRESTApiFacade.RESTAPICallCallback() {
             @Override

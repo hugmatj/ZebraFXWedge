@@ -9,7 +9,9 @@ public class FXRestAPIServiceBroadcastReceiverLogin extends FxRestAPIServiceBroa
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        mSourceName = RESTHostServiceConstants.FX_INTENT_ACTION_LOGIN;
         Log.d(FXReaderRESTApiFacade.TAG, "FXRestAPIServiceBroadcastReceiverLogin::onReceive");
+        mContext = context;
         FXReaderRESTApiFacade fxReaderRESTApiFacade = new FXReaderRESTApiFacade(context);
         fxReaderRESTApiFacade.login(new FXReaderRESTApiFacade.RESTAPICallCallback() {
             @Override

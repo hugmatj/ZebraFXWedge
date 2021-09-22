@@ -33,8 +33,19 @@ public class FXReaderRESTApiFacade {
 
     public enum EResult
     {
-        SUCCESS,
-        ERROR
+        SUCCESS("SUCCESS"),
+        ERROR("ERROR");
+
+        String mName = "";
+        EResult(String name)
+        {
+            mName = name;
+        }
+
+        public String toString()
+        {
+            return mName;
+        }
     }
 
     protected FXReaderRESTApiFacade(Context context)

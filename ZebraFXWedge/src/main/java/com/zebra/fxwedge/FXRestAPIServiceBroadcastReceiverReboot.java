@@ -8,7 +8,9 @@ public class FXRestAPIServiceBroadcastReceiverReboot extends FxRestAPIServiceBro
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        mSourceName = RESTHostServiceConstants.FX_INTENT_ACTION_REBOOT;
         Log.d(FXReaderRESTApiFacade.TAG, "FXRestAPIServiceBroadcastReceiverReboot::onReceive");
+        mContext = context;
         FXReaderRESTApiFacade fxReaderRESTApiFacade = new FXReaderRESTApiFacade(context);
         fxReaderRESTApiFacade.reboot(new FXReaderRESTApiFacade.RESTAPICallCallback() {
             @Override

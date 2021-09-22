@@ -55,6 +55,23 @@ public class MainActivity extends AppCompatActivity {
     }
     FXBroadcastReceiver fxBroadcastReceiver = null;
 
+    /*
+    FXIntent API Results receiver
+     */
+    protected class FXIntentAPIBroadcastReceiver extends BroadcastReceiver
+    {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+                String source = intent.getStringExtra(FXWedgeConstants.FX_INTENT_ACTION_RESULT_EXTRA_SOURCE);
+                String status = intent.getStringExtra(FXWedgeConstants.FX_INTENT_ACTION_RESULT_EXTRA_STATUS);
+                String message = intent.getStringExtra(FXWedgeConstants.FX_INTENT_ACTION_RESULT_EXTRA_MESSAGE);
+                addLineToResults("Result received from source: " + source);
+                addLineToResults("Status: " + status);
+                addLineToResults("Message: " + message);
+        }
+    }
+    FXIntentAPIBroadcastReceiver fxIntentAPIBroadcastReceiver = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
         bt_login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendIntent(FXWedgeConstants.FX_INTENT_ACTION_LOGIN, FXWedgeConstants.FX_INTENT_CATEGORY);
+                sendIntent(FXWedgeConstants.FX_INTENT_ACTION_LOGIN);
             }
         });
 
@@ -77,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
         bt_setup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendIntent(FXWedgeConstants.FX_INTENT_ACTION_SETUP, FXWedgeConstants.FX_INTENT_CATEGORY);
+                sendIntent(FXWedgeConstants.FX_INTENT_ACTION_SETUP);
             }
         });
 
@@ -85,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
         bt_reboot.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendIntent(FXWedgeConstants.FX_INTENT_ACTION_REBOOT, FXWedgeConstants.FX_INTENT_CATEGORY);
+                sendIntent(FXWedgeConstants.FX_INTENT_ACTION_REBOOT);
             }
         });
 
@@ -93,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
         bt_start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendIntent(FXWedgeConstants.FX_INTENT_ACTION_START_READING, FXWedgeConstants.FX_INTENT_CATEGORY);
+                sendIntent(FXWedgeConstants.FX_INTENT_ACTION_START_READING);
             }
         });
 
@@ -101,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
         bt_stop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendIntent(FXWedgeConstants.FX_INTENT_ACTION_STOP_READING, FXWedgeConstants.FX_INTENT_CATEGORY);
+                sendIntent(FXWedgeConstants.FX_INTENT_ACTION_STOP_READING);
             }
         });
 
@@ -118,10 +135,16 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         mScrollDownHandler = new Handler(Looper.getMainLooper());
-        IntentFilter filter = new IntentFilter(FXWedgeConstants.FXDATA_BROADCAST_INTENT_ACTION);
-        filter.addCategory(FXWedgeConstants.FXDATA_BROADCAST_INTENT_CATEGORY);
+
+        IntentFilter filterFXData = new IntentFilter(FXWedgeConstants.FXDATA_BROADCAST_INTENT_ACTION);
+        filterFXData.addCategory(FXWedgeConstants.FXDATA_BROADCAST_INTENT_CATEGORY);
         fxBroadcastReceiver = new FXBroadcastReceiver();
-        registerReceiver(fxBroadcastReceiver, filter);
+        registerReceiver(fxBroadcastReceiver, filterFXData);
+
+        IntentFilter filterFXResults = new IntentFilter(FXWedgeConstants.FX_INTENT_ACTION_RESULT);
+        filterFXResults.addCategory(FXWedgeConstants.FX_INTENT_CATEGORY);
+        fxIntentAPIBroadcastReceiver = new FXIntentAPIBroadcastReceiver();
+        registerReceiver(fxIntentAPIBroadcastReceiver, filterFXResults);
         super.onResume();
     }
 
@@ -138,13 +161,17 @@ public class MainActivity extends AppCompatActivity {
             unregisterReceiver(fxBroadcastReceiver);
             fxBroadcastReceiver = null;
         }
+        if(fxIntentAPIBroadcastReceiver != null)
+        {
+            unregisterReceiver(fxIntentAPIBroadcastReceiver);
+            fxIntentAPIBroadcastReceiver = null;
+        }
         super.onPause();
     }
 
-    private void sendIntent(String action, String category)
+    private void sendIntent(String action)
     {
         Intent intent = new Intent(action);
-        //intent.addCategory(category);
         sendBroadcast(intent);
     }
 
