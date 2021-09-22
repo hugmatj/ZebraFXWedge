@@ -43,11 +43,7 @@ import androidx.appcompat.app.AppCompatActivity;
 //          --es startonboot "false"
 //                  If the device is rebooted, the service will not be started (unless it has been setup/configured to boot on startup).
 //
-//          - Allow access from external IPs (false = )
-//          --es allowexternalips "true"
-//              Allows external devices to connect to the service.
-//          --es allowexternalips "false"
-//              Grant access to the localhost only (only the device running the service will be allowed to use it)
+// TODO: finish to document setup intent API
 
 
 public class RESTHostServiceActivity extends AppCompatActivity {
