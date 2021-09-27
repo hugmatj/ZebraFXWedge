@@ -1,23 +1,27 @@
 package com.zebra.fxwedge;
 
+import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
+import android.net.LinkAddress;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.util.Log;
 
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import static android.content.Context.WIFI_SERVICE;
 
-public class RESTHostServiceWifiStateObserver {
+public class RESTHostServiceNetworkStateObserver {
 
     private BroadcastReceiver mNetworkStateBroadcastReceiver = null;
     protected static String mIpAddress = "";
@@ -30,7 +34,7 @@ public class RESTHostServiceWifiStateObserver {
     }
     private IIPChangeObserver mIPChangeObserver = null;
 
-    public RESTHostServiceWifiStateObserver(Context aContext, IIPChangeObserver aIIPChangeObserver)
+    public RESTHostServiceNetworkStateObserver(Context aContext, IIPChangeObserver aIIPChangeObserver)
     {
         mContext = aContext;
         mIPChangeObserver = aIIPChangeObserver;
@@ -53,7 +57,7 @@ public class RESTHostServiceWifiStateObserver {
         return mNetworkStateBroadcastReceiver != null;
     }
 
-    public  String getIPAddress()
+    public String getIPAddress()
     {
         getDeviceIP();
         return mIpAddress;
@@ -101,21 +105,6 @@ public class RESTHostServiceWifiStateObserver {
     }
 
     public boolean isConnected() {
-        /*
-        WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
-        NetworkInfo networkInfo = ((ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
-        String networkType = networkInfo.getTypeName();
-        if (networkInfo != null && isNetworkAvailable() && networkInfo.isConnected())
-        {
-            if(networkType.equalsIgnoreCase("WIFI")  && wifiManager.isWifiEnabled()) {
-                return true;
-            }
-            else if(networkType.equalsIgnoreCase("MOBILE"))
-            {
-                return true;
-            }
-        }
-        */
         ConnectivityManager connectivityManager =  (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         if(connectivityManager != null)
         {
@@ -137,21 +126,29 @@ public class RESTHostServiceWifiStateObserver {
     }
 
     public void getDeviceIP() {
-        WifiManager wifiManager = (WifiManager) mContext.getSystemService(WIFI_SERVICE);
-        // If wifi is enabled we just get the WIFI address
-        if(wifiManager != null && wifiManager.isWifiEnabled()) {
-            getWifiIPAddress(wifiManager);
-        }
-        else {
-            // We try to get the WAN address (or any other address...)
-            // TODO: test on ethernet craddle to see if it gets the right IP address
-            try {
-                getWanIPAddress();
-            } catch (Exception e) {
-                e.printStackTrace();
-                mIpAddress = "127.0.0.1";
+        if(isConnected()) {
+            mIpAddress = "";
+            WifiManager wifiManager = (WifiManager) mContext.getSystemService(WIFI_SERVICE);
+            // If wifi is enabled we just get the WIFI address
+            if (wifiManager != null && wifiManager.isWifiEnabled() ) {
+                getWifiIPAddress(wifiManager);
+            }
+            if(mIpAddress == "" || mIpAddress.equalsIgnoreCase("0.0.0.0")){
+                // We try to get the WAN address (or any other address...)
+                try {
+                    getWanIPAddress();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    mIpAddress = "";
+                }
+            }
+            if(mIpAddress == "")
+            {
+                getLanIPAddress();
             }
         }
+        else
+            mIpAddress = "127.0.0.1";
     }
 
     private void getWifiIPAddress(WifiManager wifiManager)
@@ -231,5 +228,27 @@ public class RESTHostServiceWifiStateObserver {
                 mJobDoneLatch = null;
             }
         }
+    }
+
+    private void getLanIPAddress()
+    {
+        ConnectivityManager connectivityManager = (ConnectivityManager) mContext.getSystemService(Service.CONNECTIVITY_SERVICE);
+        try
+        {
+            List<LinkAddress> linkAddresses =  connectivityManager.getLinkProperties(connectivityManager.getActiveNetwork()).getLinkAddresses();
+            for(LinkAddress address : linkAddresses)
+            {
+                if(address.getAddress() instanceof Inet4Address == true)
+                {
+                    mIpAddress = address.getAddress().toString();
+                    return;
+                }
+            }
+        }
+        catch(Exception e)
+        {
+            mIpAddress = "";
+        }
+        mIpAddress = "";
     }
 }

@@ -8,9 +8,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -50,7 +48,7 @@ public class RESTHostServiceActivity extends AppCompatActivity {
     private Switch mStartStopServiceSwitch = null;
     private TextView mDeviceIPTextView = null;
     protected static RESTHostServiceActivity mMainActivity;
-    private RESTHostServiceWifiStateObserver mIPChangeObserver = null;
+    private RESTHostServiceNetworkStateObserver mIPChangeObserver = null;
 
 
     @Override
@@ -96,7 +94,7 @@ public class RESTHostServiceActivity extends AppCompatActivity {
         mMainActivity = this;
         if(mIPChangeObserver == null)
         {
-            mIPChangeObserver = new RESTHostServiceWifiStateObserver(getApplicationContext(), new RESTHostServiceWifiStateObserver.IIPChangeObserver() {
+            mIPChangeObserver = new RESTHostServiceNetworkStateObserver(getApplicationContext(), new RESTHostServiceNetworkStateObserver.IIPChangeObserver() {
                 @Override
                 public void onIPChanged(String newIP) {
                     updateIP();

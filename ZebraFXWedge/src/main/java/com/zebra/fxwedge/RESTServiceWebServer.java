@@ -14,7 +14,7 @@ import fi.iki.elonen.NanoHTTPD;
 public class RESTServiceWebServer extends NanoHTTPD {
 
     private Context mContext = null;
-    private static RESTHostServiceWifiStateObserver mIPChangeObserver = null;
+    private static RESTHostServiceNetworkStateObserver mIPChangeObserver = null;
     protected static String mCurrentIP = "";
     private static boolean mStopServing = false;
 
@@ -59,7 +59,7 @@ public class RESTServiceWebServer extends NanoHTTPD {
         if(mIPChangeObserver == null)
         {
             // We launch the observer but we do not need to be notified here if the IP change
-            mIPChangeObserver = new RESTHostServiceWifiStateObserver(mContext, new RESTHostServiceWifiStateObserver.IIPChangeObserver() {
+            mIPChangeObserver = new RESTHostServiceNetworkStateObserver(mContext, new RESTHostServiceNetworkStateObserver.IIPChangeObserver() {
                 @Override
                 public void onIPChanged(String newIP) {
                     if(newIP.equalsIgnoreCase("0.0.0.0"))
