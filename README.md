@@ -43,7 +43,7 @@ The service can be started and stopped manually using the following adb commands
                  If the device is rebooted, the service will not be started (unless it has been setup/configured to boot on startup).
                  
          - Setup FX Reader and Android local webservice
-         - 
+         
          --es setfxip "192.168.1.1"
          
                  Set FX IP
