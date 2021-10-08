@@ -41,7 +41,17 @@ import androidx.appcompat.app.AppCompatActivity;
 //          --es startonboot "false"
 //                  If the device is rebooted, the service will not be started (unless it has been setup/configured to boot on startup).
 //
-// TODO: finish to document setup intent API
+//          - Setup FX Reader and Android local webservice
+//          --es setfxip "192.168.1.1"
+//                  Set FX IP
+//          --es setfxname "FXA0DB423"
+//                  Set FX Reader Name
+//          --es serverport "5000"
+//                  Set the port of the android local webserver
+//          --es login "admin"
+//                  Set the login information to setup the FXReader
+//          --es password "change"
+//                  Set the password information to setup the FXReader
 
 
 public class RESTHostServiceActivity extends AppCompatActivity {

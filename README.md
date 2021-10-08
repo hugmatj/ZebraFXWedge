@@ -1,5 +1,38 @@
 # ZEBRA FXWedge
 
+The service can be launched using the graphical user interface, intent actions or adb.
+If the option "Start on boot" is enabled, the service will be automatically launched when the boot is complete.
+The service respond to two intent actions (both uses the category: android.intent.category.DEFAULT)
+- "com.zebra.fxwedge.startservice" sent on the component "com.zebra.fxwedge/com.zebra.fxwedge.StartServiceBroadcastReceiver":
+  Start the service.
+- "com.zebra.fxwedge.stopservice" sent on the component "com.zebra.fxwedge/com.zebra.fxwedge.StopServiceBroadcastReceiver":
+  Stop the service.
+The service can be started and stopped manually using the following adb commands:
+ - Start service:
+     adb shell am broadcast -a com.zebra.fxwedge.startservice -n com.zebra.fxwedge/com.zebra.fxwedge.StartServiceBroadcastReceiver
+ - Stop service:
+     adb shell am broadcast -a com.zebra.fxwedge.stopservice -n com.zebra.fxwedge/com.zebra.fxwedge.StopServiceBroadcastReceiver
+ - Setup service
+         The service can be configured using the following intent:
+         adb shell am broadcast -a com.zebra.fxwedge.setupservice -n com.zebra.fxwedge/com.zebra.fxwedge.SetupServiceBroadcastReceiver --es startonboot "true" --es allowexternalips "false"
+         The command must contain at least one of the extras:
+         - Configure autostart on boot:
+         --es startonboot "true"
+                 If the device get rebooted the service will start automatically once the reboot is completed.
+         --es startonboot "false"
+                 If the device is rebooted, the service will not be started (unless it has been setup/configured to boot on startup).
+         - Setup FX Reader and Android local webservice
+         --es setfxip "192.168.1.1"
+                 Set FX IP
+         --es setfxname "FXA0DB423"
+                 Set FX Reader Name
+         --es serverport "5000"
+                 Set the port of the android local webserver
+         --es login "admin"
+                 Set the login information to setup the FXReader
+         --es password "change"
+                 Set the password information to setup the FXReader
+
 # END USER LICENSE AGREEMENT (UNRESTRICTED SOFTWARE)
 
 
