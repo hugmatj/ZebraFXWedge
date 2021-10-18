@@ -1,0 +1,426 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".RestHostServiceTestActivity">
+
+    <TextView
+        android:id="@+id/tv_title_fxcloud"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="FxCloud Setup"
+        android:textAlignment="center" />
+
+    <Button
+        android:id="@+id/bt_login"
+        android:layout_below="@id/tv_title_fxcloud"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:text="Login" />
+
+    <Button
+        android:id="@+id/bt_setup"
+        android:layout_below="@id/tv_title_fxcloud"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_toLeftOf="@id/bt_login"
+        android:layout_toEndOf="@+id/bt_login"
+        android:layout_toRightOf="@+id/bt_login"
+        android:text="Setup FX Reader" />
+
+    <Button
+        android:id="@+id/bt_reboot"
+        android:layout_below="@id/tv_title_fxcloud"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_toLeftOf="@id/bt_setup"
+        android:layout_toEndOf="@+id/bt_setup"
+        android:layout_toRightOf="@+id/bt_setup"
+        android:text="Reboot reader" />
+
+    <View
+        android:id="@+id/view_separator1"
+        android:layout_below="@id/bt_login"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:background="@android:color/darker_gray"/>
+
+    <TextView
+        android:id="@+id/tv_title_mode"
+        android:layout_below="@id/view_separator1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Mode Setup"
+        android:textAlignment="center" />
+
+    <CheckBox
+        android:id="@+id/cb_A1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_title_mode"
+        android:text="Antenna1" />
+
+    <CheckBox
+        android:id="@+id/cb_A2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_title_mode"
+        android:layout_toLeftOf="@id/cb_A1"
+        android:layout_toEndOf="@+id/cb_A1"
+        android:layout_toRightOf="@+id/cb_A1"
+        android:text="Antenna2" />
+
+    <CheckBox
+        android:id="@+id/cb_A3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_title_mode"
+        android:layout_toLeftOf="@id/cb_A2"
+        android:layout_toEndOf="@+id/cb_A2"
+        android:layout_toRightOf="@+id/cb_A2"
+        android:text="Antenna3" />
+
+    <CheckBox
+        android:id="@+id/cb_A4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_title_mode"
+        android:layout_toLeftOf="@id/cb_A3"
+        android:layout_toEndOf="@+id/cb_A3"
+        android:layout_toRightOf="@+id/cb_A3"
+        android:text="Antenna4" />
+
+    <TextView
+        android:id="@+id/tv_power_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/cb_A1"
+        android:layout_marginLeft="10dp"
+        android:text="Power:" />
+
+    <TextView
+        android:id="@+id/tv_power"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/cb_A1"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_toLeftOf="@id/tv_power_title"
+        android:layout_toEndOf="@id/tv_power_title"
+        android:layout_toRightOf="@id/tv_power_title"
+        android:text="29" />
+
+    <SeekBar
+        android:id="@+id/sb_power"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/cb_A1"
+        android:layout_marginRight="10dp"
+        android:layout_toLeftOf="@id/tv_power"
+        android:layout_toEndOf="@id/tv_power"
+        android:layout_toRightOf="@id/tv_power"
+        android:max="29"
+        android:progress="1" />
+
+    <TextView
+        android:id="@+id/tv_mode_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/sb_power"
+        android:layout_marginLeft="10dp"
+        android:text="Mode:" />
+
+    <RadioGroup
+        android:id="@+id/rb_mode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/sb_power"
+        android:layout_toLeftOf="@id/tv_mode_title"
+        android:layout_toEndOf="@id/tv_mode_title"
+        android:layout_toRightOf="@id/tv_mode_title"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/rb_simple"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="simple"
+            android:textSize="12sp" />
+
+        <RadioButton
+            android:id="@+id/rb_inventory"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="inventory"
+            android:textSize="12sp" />
+
+        <RadioButton
+            android:id="@+id/rb_portal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="portal"
+            android:textSize="12sp" />
+
+        <RadioButton
+            android:id="@+id/rb_conveyor"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="conveyor"
+            android:textSize="12sp" />
+
+        <RadioButton
+            android:id="@+id/rb_custom"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="custom"
+            android:textSize="12sp" />
+
+    </RadioGroup>
+
+    <TextView
+        android:id="@+id/tv_interval_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/rb_mode"
+        android:layout_marginLeft="10dp"
+        android:text="Interval:" />
+
+    <EditText
+        android:id="@+id/et_interval"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/rb_mode"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_toLeftOf="@id/tv_interval_title"
+        android:layout_toEndOf="@id/tv_interval_title"
+        android:layout_toRightOf="@id/tv_interval_title"
+        android:text="1"
+        android:textAlignment="center"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/tv_intervalunit_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/rb_mode"
+        android:layout_toLeftOf="@id/et_interval"
+        android:layout_toEndOf="@id/et_interval"
+        android:layout_toRightOf="@id/et_interval"
+        android:layout_marginLeft="10dp"
+        android:text="Unit:" />
+
+    <EditText
+        android:id="@+id/et_intervalunit"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/rb_mode"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_toLeftOf="@id/tv_intervalunit_title"
+        android:layout_toEndOf="@id/tv_intervalunit_title"
+        android:layout_toRightOf="@id/tv_intervalunit_title"
+        android:text="seconds"
+        android:textAlignment="center"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/tv_filter_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/et_intervalunit"
+        android:layout_marginLeft="10dp"
+        android:text="Filter\nvalue:" />
+
+    <EditText
+        android:id="@+id/et_filter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/et_intervalunit"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_toLeftOf="@id/tv_filter_title"
+        android:layout_toEndOf="@id/tv_filter_title"
+        android:layout_toRightOf="@id/tv_filter_title"
+        android:text="[a-zA-Z0-9]{2,}"
+        android:textAlignment="center"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/tv_filtermatch_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_filter_title"
+        android:layout_marginLeft="10dp"
+        android:text="Filter\nmatch:" />
+
+    <EditText
+        android:id="@+id/et_filtermatch"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_filter_title"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_toLeftOf="@id/tv_filtermatch_title"
+        android:layout_toEndOf="@id/tv_filtermatch_title"
+        android:layout_toRightOf="@id/tv_filtermatch_title"
+        android:text="regex"
+        android:textAlignment="center"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/tv_filteroperation_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_filter_title"
+        android:layout_toLeftOf="@id/et_filtermatch"
+        android:layout_toEndOf="@id/et_filtermatch"
+        android:layout_toRightOf="@id/et_filtermatch"
+        android:layout_marginLeft="10dp"
+        android:text="Filter\noperation:" />
+
+    <EditText
+        android:id="@+id/et_filteroperation"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_filter_title"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_toLeftOf="@id/tv_filteroperation_title"
+        android:layout_toEndOf="@id/tv_filteroperation_title"
+        android:layout_toRightOf="@id/tv_filteroperation_title"
+        android:text="include"
+        android:textAlignment="center"
+        android:textSize="12sp" />
+
+    <Button
+        android:id="@+id/bt_getconfig"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/et_filteroperation"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:text="Get Config" />
+
+    <Button
+        android:id="@+id/bt_getantennas"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/et_filteroperation"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_toLeftOf="@id/bt_getconfig"
+        android:layout_toEndOf="@+id/bt_getconfig"
+        android:layout_toRightOf="@+id/bt_getconfig"
+        android:text="Get Antennas" />
+
+    <Button
+        android:id="@+id/bt_setconfig"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_below="@id/et_filteroperation"
+        android:layout_toLeftOf="@id/bt_getantennas"
+        android:layout_toEndOf="@+id/bt_getantennas"
+        android:layout_toRightOf="@+id/bt_getantennas"
+        android:text="Set Config" />
+
+    <View
+        android:id="@+id/view_separator2"
+        android:layout_below="@id/bt_getconfig"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:background="@android:color/darker_gray"/>
+
+    <ScrollView
+        android:id="@+id/sv_results"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/bt_start"
+        android:layout_below="@+id/view_separator2"
+        android:layout_alignParentBottom="false"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="5dp">
+
+        <TextView
+            android:id="@+id/et_results"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/ll_scan"
+            android:inputType="textMultiLine" />
+    </ScrollView>
+
+    <View
+        android:id="@+id/view_separator3"
+        android:layout_above="@id/bt_start"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:background="@android:color/darker_gray"/>
+
+    <Button
+        android:id="@+id/bt_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/cb_showreadings"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="10dp"
+        android:text="Start Reading" />
+
+    <Button
+        android:id="@+id/bt_stop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/cb_showreadings"
+        android:layout_marginLeft="10dp"
+        android:layout_toLeftOf="@id/bt_start"
+        android:layout_toEndOf="@+id/bt_start"
+        android:layout_toRightOf="@+id/bt_start"
+        android:text="Stop Reading" />
+
+    <Button
+        android:id="@+id/bt_clear"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/cb_showreadings"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_toLeftOf="@id/bt_stop"
+        android:layout_toEndOf="@+id/bt_stop"
+        android:layout_toRightOf="@+id/bt_stop"
+        android:text="Clear Status" />
+
+    <CheckBox
+        android:id="@+id/cb_showreadings"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:text="Show Readings" />
+
+</RelativeLayout>

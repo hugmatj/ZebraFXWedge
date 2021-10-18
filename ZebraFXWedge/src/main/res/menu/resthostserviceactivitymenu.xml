@@ -2,13 +2,18 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".RESTHostServiceActivity">
-            <item
-                android:id="@+id/menuitem_setup"
-                android:title="Setup" />
-            <item
-                android:id="@+id/menuitem_test"
-                android:title="Test Activity" />
-            <item
-                android:id="@+id/menuitem_license"
-                android:title="License" />
+    <item
+        android:id="@+id/menuitem_fxwedgesetup"
+        android:title="FxWedge Setup" />
+    <item
+        android:id="@+id/menuitem_setupfxhardware"
+        android:title="Setup FX Hardware" />
+
+    <item
+        android:id="@+id/menuitem_test"
+        android:title="Test Activity" />
+
+    <item
+        android:id="@+id/menuitem_license"
+        android:title="License" />
 </menu>

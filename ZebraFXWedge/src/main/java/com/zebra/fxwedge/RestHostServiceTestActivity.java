@@ -25,9 +25,6 @@ public class RestHostServiceTestActivity extends AppCompatActivity {
     private String mResults = "";
     private boolean mOptmizeRefresh = true;
     private CheckBox cb_displayReadings = null;
-    private Button bt_login = null;
-    private Button bt_setup = null;
-    private Button bt_reboot = null;
     private Button bt_start = null;
     private Button bt_stop = null;
     private Button bt_clear = null;
@@ -70,48 +67,6 @@ public class RestHostServiceTestActivity extends AppCompatActivity {
         et_results = (TextView)findViewById(R.id.et_results);
         sv_results = (ScrollView)findViewById(R.id.sv_results);
         cb_displayReadings = (CheckBox)findViewById(R.id.cb_showreadings);
-
-        bt_login = (Button)findViewById(R.id.bt_login);
-        bt_login.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                fxReaderRESTApiFacade.login(new FXReaderRESTApiFacade.RESTAPICallCallback() {
-                    @Override
-                    public void onRestCallFinished(FXReaderRESTApiFacade.EResult result, String message) {
-                        addLineToResults(result == FXReaderRESTApiFacade.EResult.SUCCESS ? "Login successful" : "Login error");
-                        addLineToResults("Message: " + message);
-                    }
-                });
-            }
-        });
-
-        bt_setup = (Button)findViewById(R.id.bt_setup);
-        bt_setup.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                fxReaderRESTApiFacade.setupFxReader(new FXReaderRESTApiFacade.RESTAPICallCallback() {
-                    @Override
-                    public void onRestCallFinished(FXReaderRESTApiFacade.EResult result, String message) {
-                        addLineToResults(result == FXReaderRESTApiFacade.EResult.SUCCESS ? "Setup successful" : "Setup error");
-                        addLineToResults("Message: " + message);
-                    }
-                });
-            }
-        });
-
-        bt_reboot = (Button)findViewById(R.id.bt_reboot);
-        bt_reboot.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                fxReaderRESTApiFacade.reboot(new FXReaderRESTApiFacade.RESTAPICallCallback() {
-                    @Override
-                    public void onRestCallFinished(FXReaderRESTApiFacade.EResult result, String message) {
-                        addLineToResults(result == FXReaderRESTApiFacade.EResult.SUCCESS ? "Reboot successful" : "Reboot error");
-                        addLineToResults("Message: " + message);
-                    }
-                });
-            }
-        });
 
         bt_start = (Button)findViewById(R.id.bt_start);
         bt_start.setOnClickListener(new View.OnClickListener() {

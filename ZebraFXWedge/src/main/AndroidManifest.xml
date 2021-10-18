@@ -24,6 +24,9 @@
             android:name=".FXWedgeSetupActivity"
             android:exported="true" />
         <activity
+            android:name=".FXHardwareSetupActivity"
+            android:exported="true" />
+        <activity
             android:name=".RestHostServiceTestActivity"
             android:exported="true" />
         <activity android:name=".LicenceActivity" />

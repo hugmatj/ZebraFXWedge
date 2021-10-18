@@ -7,41 +7,9 @@
     tools:context=".RestHostServiceTestActivity">
 
     <Button
-        android:id="@+id/bt_login"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_marginTop="10dp"
-        android:layout_marginLeft="10dp"
-        android:text="Login" />
-
-    <Button
-        android:id="@+id/bt_setup"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="10dp"
-        android:layout_toLeftOf="@id/bt_login"
-        android:layout_toEndOf="@+id/bt_login"
-        android:layout_toRightOf="@+id/bt_login"
-        android:text="Setup FX Reader" />
-
-    <Button
-        android:id="@+id/bt_reboot"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="10dp"
-        android:layout_toLeftOf="@id/bt_setup"
-        android:layout_toEndOf="@+id/bt_setup"
-        android:layout_toRightOf="@+id/bt_setup"
-        android:text="Reboot reader" />
-
-    <Button
         android:id="@+id/bt_start"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/bt_login"
         android:layout_alignParentLeft="true"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="10dp"
@@ -53,7 +21,6 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="10dp"
-        android:layout_below="@id/bt_login"
         android:layout_toLeftOf="@id/bt_start"
         android:layout_toEndOf="@+id/bt_start"
         android:layout_toRightOf="@+id/bt_start"
@@ -63,7 +30,6 @@
         android:id="@+id/bt_clear"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/bt_login"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="10dp"
         android:layout_toLeftOf="@id/bt_stop"

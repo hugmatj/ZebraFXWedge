@@ -10,6 +10,10 @@ public class RESTHostServiceBroadcastReceiverSetup extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.d(RESTHostServiceConstants.TAG, "RESTHostServiceBroadcastReceiverSetup::onReceive");
+        if(intent.getExtras() == null) {
+            Log.e(RESTHostServiceConstants.TAG, "RESTHostServiceBroadcastReceiverSetup::onReceive::No extras found in intent.");
+            return;
+        }
         String sStartOnBoot = intent.getExtras().getString(RESTHostServiceConstants.EXTRA_CONFIGURATION_START_ON_BOOT, null);
         if(sStartOnBoot != null)
         {

@@ -20,19 +20,19 @@ import androidx.appcompat.app.AppCompatActivity;
 //
 //
 // The service respond to two intent actions (both uses the category: android.intent.category.DEFAULT)
-// - "com.zebra.fxwedge.startservice" sent on the component "com.zebra.fxwedge/com.zebra.fxwedge.StartServiceBroadcastReceiver":
+// - "com.zebra.fxwedge.startservice" sent on the component "com.zebra.fxwedge/com.zebra.fxwedge.RESTHostServiceBroadcastReceiverStart":
 //   Start the service.
-// - "com.zebra.fxwedge.stopservice" sent on the component "com.zebra.fxwedge/com.zebra.fxwedge.StopServiceBroadcastReceiver":
+// - "com.zebra.fxwedge.stopservice" sent on the component "com.zebra.fxwedge/com.zebra.fxwedge.RESTHostServiceBroadcastReceiverStop":
 //   Stop the service.
 //
 // The service can be started and stopped manually using the following adb commands:
 //  - Start service:
-//      adb shell am broadcast -a com.zebra.fxwedge.startservice -n com.zebra.fxwedge/com.zebra.fxwedge.StartServiceBroadcastReceiver
+//      adb shell am broadcast -a com.zebra.fxwedge.startservice -n com.zebra.fxwedge/com.zebra.fxwedge.RESTHostServiceBroadcastReceiverStart
 //  - Stop service:
-//      adb shell am broadcast -a com.zebra.fxwedge.stopservice -n com.zebra.fxwedge/com.zebra.fxwedge.StopServiceBroadcastReceiver
+//      adb shell am broadcast -a com.zebra.fxwedge.stopservice -n com.zebra.fxwedge/com.zebra.fxwedge.RESTHostServiceBroadcastReceiverStop
 //  - Setup service
 //          The service can be configured using the following intent:
-//          adb shell am broadcast -a com.zebra.fxwedge.setupservice -n com.zebra.fxwedge/com.zebra.fxwedge.SetupServiceBroadcastReceiver --es startonboot "true" --es allowexternalips "false"
+//          adb shell am broadcast -a com.zebra.fxwedge.setupservice -n com.zebra.fxwedge/com.zebra.fxwedge.RESTHostServiceBroadcastReceiverSetup --es startonboot "true"
 //          The command must contain at least one of the extras:
 //
 //          - Configure autostart on boot:
@@ -154,8 +154,11 @@ public class RESTHostServiceActivity extends AppCompatActivity {
 
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menuitem_setup:
+            case R.id.menuitem_fxwedgesetup:
                 startActivity(new Intent(RESTHostServiceActivity.this, FXWedgeSetupActivity.class));
+                break;
+            case R.id.menuitem_setupfxhardware:
+                startActivity(new Intent(RESTHostServiceActivity.this, FXHardwareSetupActivity.class));
                 break;
             case R.id.menuitem_test:
                 startActivity(new Intent(RESTHostServiceActivity.this, RestHostServiceTestActivity.class));
