@@ -6,6 +6,9 @@ import android.content.IntentFilter;
 public class FxRestAPIServiceBroadcastReceiverHelper {
     protected static FXRestAPIServiceBroadcastReceiverLogin restAPIServiceBroadcastReceiverLogin;
     protected static FXRestAPIServiceBroadcastReceiverSetup restAPIServiceBroadcastReceiverSetup;
+    protected static FXRestAPIServiceBroadcastReceiverEnroll restAPIServiceBroadcastReceiverEnroll;
+    protected static FXRestAPIServiceBroadcastReceiverSetMode restAPIServiceBroadcastReceiverSetMode;
+    protected static FXRestAPIServiceBroadcastReceiverGetMode restAPIServiceBroadcastReceiverGetMode;
     protected static FXRestAPIServiceBroadcastReceiverReboot restAPIServiceBroadcastReceiverReboot;
     protected static FXRestAPIServiceBroadcastReceiverStartReading fxRestAPIServiceBroadcastReceiverStartReading;
     protected static FXRestAPIServiceBroadcastReceiverStopReading fxRestAPIServiceBroadcastReceiverStopReading;
@@ -16,6 +19,15 @@ public class FxRestAPIServiceBroadcastReceiverHelper {
 
         restAPIServiceBroadcastReceiverSetup = new FXRestAPIServiceBroadcastReceiverSetup();
         context.registerReceiver(restAPIServiceBroadcastReceiverSetup, new IntentFilter(RESTHostServiceConstants.FX_INTENT_ACTION_SETUP));
+
+        restAPIServiceBroadcastReceiverEnroll = new FXRestAPIServiceBroadcastReceiverEnroll();
+        context.registerReceiver(restAPIServiceBroadcastReceiverEnroll, new IntentFilter(RESTHostServiceConstants.FX_INTENT_ACTION_ENROLL));
+
+        restAPIServiceBroadcastReceiverSetMode = new FXRestAPIServiceBroadcastReceiverSetMode();
+        context.registerReceiver(restAPIServiceBroadcastReceiverSetMode, new IntentFilter(RESTHostServiceConstants.FX_INTENT_ACTION_SET_MODE));
+
+        restAPIServiceBroadcastReceiverGetMode = new FXRestAPIServiceBroadcastReceiverGetMode();
+        context.registerReceiver(restAPIServiceBroadcastReceiverGetMode, new IntentFilter(RESTHostServiceConstants.FX_INTENT_ACTION_GET_MODE));
 
         restAPIServiceBroadcastReceiverReboot = new FXRestAPIServiceBroadcastReceiverReboot();
         context.registerReceiver(restAPIServiceBroadcastReceiverReboot, new IntentFilter(RESTHostServiceConstants.FX_INTENT_ACTION_REBOOT));
@@ -34,9 +46,20 @@ public class FxRestAPIServiceBroadcastReceiverHelper {
         {
             context.unregisterReceiver(restAPIServiceBroadcastReceiverLogin);
             context.unregisterReceiver(restAPIServiceBroadcastReceiverSetup);
+            context.unregisterReceiver(restAPIServiceBroadcastReceiverEnroll);
+            context.unregisterReceiver(restAPIServiceBroadcastReceiverSetMode);
+            context.unregisterReceiver(restAPIServiceBroadcastReceiverGetMode);
             context.unregisterReceiver(restAPIServiceBroadcastReceiverReboot);
             context.unregisterReceiver(fxRestAPIServiceBroadcastReceiverStartReading);
             context.unregisterReceiver(fxRestAPIServiceBroadcastReceiverStopReading);
+            restAPIServiceBroadcastReceiverLogin = null;
+            restAPIServiceBroadcastReceiverSetup = null;
+            restAPIServiceBroadcastReceiverEnroll = null;
+            restAPIServiceBroadcastReceiverSetMode = null;
+            restAPIServiceBroadcastReceiverGetMode = null;
+            restAPIServiceBroadcastReceiverReboot = null;
+            fxRestAPIServiceBroadcastReceiverStartReading = null;
+            fxRestAPIServiceBroadcastReceiverStopReading = null;
         }
     }
 }

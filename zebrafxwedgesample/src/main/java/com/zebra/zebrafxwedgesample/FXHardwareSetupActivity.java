@@ -1,4 +1,4 @@
-package com.zebra.fxwedge;
+package com.zebra.zebrafxwedgesample;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -71,7 +71,7 @@ public class FXHardwareSetupActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             if(cb_displayReadings.isChecked()) {
-                Bundle extraDataBundle = intent.getBundleExtra(RESTHostServiceConstants.FXDATA_BROADCAST_INTENT_EXTRA_READDATA);
+                Bundle extraDataBundle = intent.getBundleExtra(FXWedgeConstants.FXDATA_BROADCAST_INTENT_EXTRA_READDATA);
                 FXReadsDataModel data = FXReadsDataModel.fromBundle(extraDataBundle);
                 if (data != null)
                     addLineToResults(data.toString());
@@ -81,16 +81,47 @@ public class FXHardwareSetupActivity extends AppCompatActivity {
     FXBroadcastReceiver fxBroadcastReceiver = null;
 
     /*
-    FX REST API Facade
-     */
-    FXReaderRESTApiFacade fxReaderRESTApiFacade = null;
+    FXIntent API Results receiver
+    */
+    protected class FXIntentAPIBroadcastReceiver extends BroadcastReceiver
+    {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String source = intent.getStringExtra(FXWedgeConstants.FX_INTENT_ACTION_RESULT_EXTRA_SOURCE);
+            String status = intent.getStringExtra(FXWedgeConstants.FX_INTENT_ACTION_RESULT_EXTRA_STATUS);
+            String message = intent.getStringExtra(FXWedgeConstants.FX_INTENT_ACTION_RESULT_EXTRA_MESSAGE);
+            addLineToResults("Result received from source: " + source);
+            addLineToResults("Status: " + status);
+            addLineToResults("Message: " + message);
+            if(source.equalsIgnoreCase(FXWedgeConstants.FX_INTENT_ACTION_GET_MODE) && status.equalsIgnoreCase(EResult.SUCCESS.toString()))
+            {
+                updateSettingsFromGetMode(intent);
+            }
+        }
+    }
+    FXIntentAPIBroadcastReceiver fxIntentAPIBroadcastReceiver = null;
+
+    public enum EResult
+    {
+        SUCCESS("SUCCESS"),
+        ERROR("ERROR");
+
+        String mName = "";
+        EResult(String name)
+        {
+            mName = name;
+        }
+
+        public String toString()
+        {
+            return mName;
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_fxhardwaresetup);
-
-        fxReaderRESTApiFacade = new FXReaderRESTApiFacade(this);
+        setContentView(R.layout.activity_fxhardware_setup);
 
         et_results = (TextView)findViewById(R.id.et_results);
         sv_results = (ScrollView)findViewById(R.id.sv_results);
@@ -217,13 +248,7 @@ public class FXHardwareSetupActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 addLineToResults("Login to FX Reader.");
-                fxReaderRESTApiFacade.login(new FXReaderRESTApiFacade.RESTAPICallCallback() {
-                    @Override
-                    public void onRestCallFinished(FXReaderRESTApiFacade.EResult result, String message) {
-                        addLineToResults(result == FXReaderRESTApiFacade.EResult.SUCCESS ? "Login successful" : "Login error");
-                        addLineToResults("Message: " + message);
-                    }
-                });
+                sendIntent(FXWedgeConstants.FX_INTENT_ACTION_LOGIN);
             }
         });
 
@@ -232,13 +257,7 @@ public class FXHardwareSetupActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 addLineToResults("Setup FX Reader local cloud parameters.");
-                fxReaderRESTApiFacade.setupFxReader(new FXReaderRESTApiFacade.RESTAPICallCallback() {
-                    @Override
-                    public void onRestCallFinished(FXReaderRESTApiFacade.EResult result, String message) {
-                        addLineToResults(result == FXReaderRESTApiFacade.EResult.SUCCESS ? "Setup successful" : "Setup error");
-                        addLineToResults("Message: " + message);
-                    }
-                });
+                sendIntent(FXWedgeConstants.FX_INTENT_ACTION_SETUP);
             }
         });
 
@@ -247,13 +266,7 @@ public class FXHardwareSetupActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 addLineToResults("Enroll FX Reader to local cloud.");
-                fxReaderRESTApiFacade.enrollToCloud(new FXReaderRESTApiFacade.RESTAPICallCallback() {
-                    @Override
-                    public void onRestCallFinished(FXReaderRESTApiFacade.EResult result, String message) {
-                        addLineToResults(result == FXReaderRESTApiFacade.EResult.SUCCESS ? "Enroll successful" : "Enroll error");
-                        addLineToResults("Message: " + message);
-                    }
-                });
+                sendIntent(FXWedgeConstants.FX_INTENT_ACTION_ENROLL);
             }
         });
 
@@ -262,13 +275,7 @@ public class FXHardwareSetupActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 addLineToResults("Reboot FX Reader.");
-                fxReaderRESTApiFacade.reboot(new FXReaderRESTApiFacade.RESTAPICallCallback() {
-                    @Override
-                    public void onRestCallFinished(FXReaderRESTApiFacade.EResult result, String message) {
-                        addLineToResults(result == FXReaderRESTApiFacade.EResult.SUCCESS ? "Reboot successful" : "Reboot error");
-                        addLineToResults("Message: " + message);
-                    }
-                });
+                sendIntent(FXWedgeConstants.FX_INTENT_ACTION_REBOOT);
             }
         });
 
@@ -277,13 +284,7 @@ public class FXHardwareSetupActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 addLineToResults("Start Reading.");
-                fxReaderRESTApiFacade.startReading(new FXReaderRESTApiFacade.RESTAPICallCallback() {
-                    @Override
-                    public void onRestCallFinished(FXReaderRESTApiFacade.EResult result, String message) {
-                        addLineToResults(result == FXReaderRESTApiFacade.EResult.SUCCESS ? "Start reading successful" : "Start reading error");
-                        addLineToResults("Message: " + message);
-                    }
-                });
+                sendIntent(FXWedgeConstants.FX_INTENT_ACTION_START_READING);
             }
         });
 
@@ -292,13 +293,7 @@ public class FXHardwareSetupActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 addLineToResults("Stop Reading");
-                fxReaderRESTApiFacade.stopReading(new FXReaderRESTApiFacade.RESTAPICallCallback() {
-                    @Override
-                    public void onRestCallFinished(FXReaderRESTApiFacade.EResult result, String message) {
-                        addLineToResults(result == FXReaderRESTApiFacade.EResult.SUCCESS ? "Stop reading successful" : "Stop reading error");
-                        addLineToResults("Message: " + message);
-                    }
-                });
+                sendIntent(FXWedgeConstants.FX_INTENT_ACTION_STOP_READING);
             }
         });
 
@@ -316,40 +311,7 @@ public class FXHardwareSetupActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 addLineToResults("Get FX Reader configuration");
-                fxReaderRESTApiFacade.getMode(new FXReaderRESTApiFacade.RESTAPICallCallback() {
-                    @Override
-                    public void onRestCallFinished(FXReaderRESTApiFacade.EResult result, String message) {
-                        Log.d(TAG, "getModeResult: " + result.toString());
-                        Log.d(TAG, "getModeMessage: " + message);
-                        if(result == FXReaderRESTApiFacade.EResult.SUCCESS) {
-                            FXReaderRESTApiFacade.GetSetModeConfig setmode = FXReaderRESTApiFacade.getSetModeConfigFromJSon(message);
-                            sb_transmitPowerA1.setProgress((int) (setmode.transmitPowerAntenna1 * 10.0f));
-                            tv_transmitPowerA1.setText(String.valueOf(setmode.transmitPowerAntenna1));
-                            sb_transmitPowerA2.setProgress((int) (setmode.transmitPowerAntenna2 * 10.0f));
-                            tv_transmitPowerA2.setText(String.valueOf(setmode.transmitPowerAntenna2));
-                            sb_transmitPowerA3.setProgress((int) (setmode.transmitPowerAntenna3 * 10.0f));
-                            tv_transmitPowerA3.setText(String.valueOf(setmode.transmitPowerAntenna3));
-                            sb_transmitPowerA4.setProgress((int) (setmode.transmitPowerAntenna4 * 10.0f));
-                            tv_transmitPowerA4.setText(String.valueOf(setmode.transmitPowerAntenna4));
-                            cb_A1.setChecked(setmode.enableAntenna1);
-                            cb_A2.setChecked(setmode.enableAntenna2);
-                            cb_A3.setChecked(setmode.enableAntenna3);
-                            cb_A4.setChecked(setmode.enableAntenna4);
-                            updateMode(setmode.type);
-                            ((EditText) findViewById(R.id.et_interval)).setText(String.valueOf(setmode.modeSpecificSettings.interval.value));
-                            ((EditText) findViewById(R.id.et_intervalunit)).setText(setmode.modeSpecificSettings.interval.unit);
-                            ((EditText) findViewById(R.id.et_filter)).setText(setmode.filter.value);
-                            ((EditText) findViewById(R.id.et_filtermatch)).setText(setmode.filter.match);
-                            ((EditText) findViewById(R.id.et_filteroperation)).setText(setmode.filter.operation);
-                            addLineToResults("Get Config succeeded");
-                            addLineToResults("JSON Configuration received:\n" + message);
-                        }
-                        else
-                        {
-                            addLineToResults("Get Config error: " + message);
-                        }
-                    }
-                });
+                sendIntent(FXWedgeConstants.FX_INTENT_ACTION_GET_MODE);
             }
         });
 
@@ -357,29 +319,7 @@ public class FXHardwareSetupActivity extends AppCompatActivity {
         bt_getConnectedAntennas.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                addLineToResults("Get antenna status (connected/disconnected)");
-                fxReaderRESTApiFacade.getStatus(new FXReaderRESTApiFacade.RESTAPICallCallback() {
-                    @Override
-                    public void onRestCallFinished(FXReaderRESTApiFacade.EResult result, String message) {
-                        if(result == FXReaderRESTApiFacade.EResult.SUCCESS)
-                        {
-                            addLineToResults("Get Antennas status succeeded");
-                            FXReaderRESTApiFacade.GetStatusData getStatusData = FXReaderRESTApiFacade.GetStatusData.fromJSon(message);
-                            addLineToResults("Antenna1:" + getStatusData.antennas.antenna1);
-                            addLineToResults("Antenna2:" + getStatusData.antennas.antenna2);
-                            addLineToResults("Antenna3:" + getStatusData.antennas.antenna3);
-                            addLineToResults("Antenna4:" + getStatusData.antennas.antenna4);
-                            ((CheckBox) findViewById(R.id.cb_A1)).setChecked(getStatusData.antennas.antenna1.equalsIgnoreCase("connected"));
-                            ((CheckBox) findViewById(R.id.cb_A2)).setChecked(getStatusData.antennas.antenna2.equalsIgnoreCase("connected"));
-                            ((CheckBox) findViewById(R.id.cb_A3)).setChecked(getStatusData.antennas.antenna3.equalsIgnoreCase("connected"));
-                            ((CheckBox) findViewById(R.id.cb_A4)).setChecked(getStatusData.antennas.antenna4.equalsIgnoreCase("connected"));
-                        }
-                        else
-                        {
-                            addLineToResults("Get Antennas status error: " + message);
-                        }
-                    }
-                });
+                addLineToResults("Get antenna status (connected/disconnected) : NOT IMPLEMENTED NOW");
             }
         });
 
@@ -387,35 +327,23 @@ public class FXHardwareSetupActivity extends AppCompatActivity {
         bt_setConfig.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                addLineToResults("Setting FX Reader configuration");
-                FXReaderRESTApiFacade.GetSetModeConfig setmode = new FXReaderRESTApiFacade.GetSetModeConfig();
-                setmode.enableAntenna1 = ((CheckBox) findViewById(R.id.cb_A1)).isChecked();
-                setmode.enableAntenna2 = ((CheckBox) findViewById(R.id.cb_A2)).isChecked();
-                setmode.enableAntenna3 = ((CheckBox) findViewById(R.id.cb_A3)).isChecked();
-                setmode.enableAntenna4 = ((CheckBox) findViewById(R.id.cb_A4)).isChecked();
-                setmode.transmitPowerAntenna1 = sb_transmitPowerA1.getProgress()/10.0f;
-                setmode.transmitPowerAntenna2 = sb_transmitPowerA2.getProgress()/10.0f;
-                setmode.transmitPowerAntenna3 = sb_transmitPowerA3.getProgress()/10.0f;
-                setmode.transmitPowerAntenna4 = sb_transmitPowerA4.getProgress()/10.0f;
-                setmode.type = getMode();
-                setmode.modeSpecificSettings.interval.value = Long.valueOf(((EditText) findViewById(R.id.et_interval)).getText().toString());
-                setmode.modeSpecificSettings.interval.unit = ((EditText) findViewById(R.id.et_intervalunit)).getText().toString();
-                setmode.filter.value = ((EditText) findViewById(R.id.et_filter)).getText().toString();
-                setmode.filter.match = ((EditText) findViewById(R.id.et_filtermatch)).getText().toString();
-                setmode.filter.operation = ((EditText) findViewById(R.id.et_filteroperation)).getText().toString();
-                fxReaderRESTApiFacade.setMode(new FXReaderRESTApiFacade.RESTAPICallCallback() {
-                    @Override
-                    public void onRestCallFinished(FXReaderRESTApiFacade.EResult result, String message) {
-                        if(result == FXReaderRESTApiFacade.EResult.SUCCESS)
-                        {
-                            addLineToResults("SetMode succeeded: " + message);
-                        }
-                        else
-                        {
-                            addLineToResults("SetMode error: " + message);
-                        }
-                    }
-                }, setmode);
+                addLineToResults("Setting FX Reader Mode");
+                Intent intent = new Intent(FXWedgeConstants.FX_INTENT_ACTION_SET_MODE);
+                intent.putExtra(FXWedgeConstants.FX_INTENT_ACTION_MODE_EXTRA_TYPE, getMode());
+                intent.putExtra(FXWedgeConstants.FX_INTENT_ACTION_MODE_EXTRA_ENABLE_A1, ((CheckBox) findViewById(R.id.cb_A1)).isChecked());
+                intent.putExtra(FXWedgeConstants.FX_INTENT_ACTION_MODE_EXTRA_ENABLE_A2, ((CheckBox) findViewById(R.id.cb_A2)).isChecked());
+                intent.putExtra(FXWedgeConstants.FX_INTENT_ACTION_MODE_EXTRA_ENABLE_A3, ((CheckBox) findViewById(R.id.cb_A3)).isChecked());
+                intent.putExtra(FXWedgeConstants.FX_INTENT_ACTION_MODE_EXTRA_ENABLE_A4, ((CheckBox) findViewById(R.id.cb_A4)).isChecked());
+                intent.putExtra(FXWedgeConstants.FX_INTENT_ACTION_MODE_EXTRA_TRANSMIT_POWER_A1, sb_transmitPowerA1.getProgress()/10.0f);
+                intent.putExtra(FXWedgeConstants.FX_INTENT_ACTION_MODE_EXTRA_TRANSMIT_POWER_A2, sb_transmitPowerA2.getProgress()/10.0f);
+                intent.putExtra(FXWedgeConstants.FX_INTENT_ACTION_MODE_EXTRA_TRANSMIT_POWER_A3, sb_transmitPowerA3.getProgress()/10.0f);
+                intent.putExtra(FXWedgeConstants.FX_INTENT_ACTION_MODE_EXTRA_TRANSMIT_POWER_A4, sb_transmitPowerA4.getProgress()/10.0f);
+                intent.putExtra(FXWedgeConstants.FX_INTENT_ACTION_MODE_EXTRA_INTERVAL_UNIT, ((EditText) findViewById(R.id.et_intervalunit)).getText().toString());
+                intent.putExtra(FXWedgeConstants.FX_INTENT_ACTION_MODE_EXTRA_INTERVAL_VALUE, Long.valueOf(((EditText) findViewById(R.id.et_interval)).getText().toString()));
+                intent.putExtra(FXWedgeConstants.FX_INTENT_ACTION_MODE_EXTRA_FILTER_MATCH, ((EditText) findViewById(R.id.et_filtermatch)).getText().toString());
+                intent.putExtra(FXWedgeConstants.FX_INTENT_ACTION_MODE_EXTRA_FILTER_OPERATION, ((EditText) findViewById(R.id.et_filteroperation)).getText().toString());
+                intent.putExtra(FXWedgeConstants.FX_INTENT_ACTION_MODE_EXTRA_FILTER_VALUE, ((EditText) findViewById(R.id.et_filter)).getText().toString());
+                sendBroadcast(intent);
             }
         });
 
@@ -432,6 +360,40 @@ public class FXHardwareSetupActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void updateSettingsFromGetMode(Intent intent)
+    {
+        updateMode(intent.getStringExtra(FXWedgeConstants.FX_INTENT_ACTION_MODE_EXTRA_TYPE));
+        cb_A1.setChecked(intent.getBooleanExtra(FXWedgeConstants.FX_INTENT_ACTION_MODE_EXTRA_ENABLE_A1, false));
+        cb_A2.setChecked(intent.getBooleanExtra(FXWedgeConstants.FX_INTENT_ACTION_MODE_EXTRA_ENABLE_A2, false));
+        cb_A3.setChecked(intent.getBooleanExtra(FXWedgeConstants.FX_INTENT_ACTION_MODE_EXTRA_ENABLE_A3, false));
+        cb_A4.setChecked(intent.getBooleanExtra(FXWedgeConstants.FX_INTENT_ACTION_MODE_EXTRA_ENABLE_A4, false));
+        float transmitPowerAntenna1 = intent.getFloatExtra(FXWedgeConstants.FX_INTENT_ACTION_MODE_EXTRA_TRANSMIT_POWER_A1, 10.0f);
+        float transmitPowerAntenna2 = intent.getFloatExtra(FXWedgeConstants.FX_INTENT_ACTION_MODE_EXTRA_TRANSMIT_POWER_A2, 10.0f);
+        float transmitPowerAntenna3 = intent.getFloatExtra(FXWedgeConstants.FX_INTENT_ACTION_MODE_EXTRA_TRANSMIT_POWER_A3, 10.0f);
+        float transmitPowerAntenna4 = intent.getFloatExtra(FXWedgeConstants.FX_INTENT_ACTION_MODE_EXTRA_TRANSMIT_POWER_A4, 10.0f);
+        sb_transmitPowerA1.setProgress((int) (transmitPowerAntenna1 * 10.0f));
+        tv_transmitPowerA1.setText(String.valueOf(transmitPowerAntenna1));
+        sb_transmitPowerA2.setProgress((int) (transmitPowerAntenna2 * 10.0f));
+        tv_transmitPowerA2.setText(String.valueOf(transmitPowerAntenna2));
+        sb_transmitPowerA3.setProgress((int) (transmitPowerAntenna3 * 10.0f));
+        tv_transmitPowerA3.setText(String.valueOf(transmitPowerAntenna3));
+        sb_transmitPowerA4.setProgress((int) (transmitPowerAntenna4 * 10.0f));
+        tv_transmitPowerA4.setText(String.valueOf(transmitPowerAntenna4));
+
+        ((EditText) findViewById(R.id.et_interval)).setText(String.valueOf(intent.getLongExtra(FXWedgeConstants.FX_INTENT_ACTION_MODE_EXTRA_INTERVAL_VALUE, 1)));
+        ((EditText) findViewById(R.id.et_intervalunit)).setText(intent.getStringExtra(FXWedgeConstants.FX_INTENT_ACTION_MODE_EXTRA_INTERVAL_UNIT));
+        ((EditText) findViewById(R.id.et_filter)).setText(intent.getStringExtra(FXWedgeConstants.FX_INTENT_ACTION_MODE_EXTRA_FILTER_VALUE));
+        ((EditText) findViewById(R.id.et_filtermatch)).setText(intent.getStringExtra(FXWedgeConstants.FX_INTENT_ACTION_MODE_EXTRA_FILTER_MATCH));
+        ((EditText) findViewById(R.id.et_filteroperation)).setText(intent.getStringExtra(FXWedgeConstants.FX_INTENT_ACTION_MODE_EXTRA_FILTER_OPERATION));
+        addLineToResults("Update Settings from GetMode succeeded");
+    }
+
+    private void sendIntent(String action)
+    {
+        Intent intent = new Intent(action);
+        sendBroadcast(intent);
     }
 
     private void setVisibility(int[] ids, int visibility)
@@ -510,10 +472,15 @@ public class FXHardwareSetupActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         mScrollDownHandler = new Handler(Looper.getMainLooper());
-        IntentFilter filter = new IntentFilter(RESTHostServiceConstants.FXDATA_BROADCAST_INTENT_ACTION);
-        filter.addCategory(RESTHostServiceConstants.FXDATA_BROADCAST_INTENT_CATEGORY);
+        IntentFilter filter = new IntentFilter(FXWedgeConstants.FXDATA_BROADCAST_INTENT_ACTION);
+        filter.addCategory(FXWedgeConstants.FXDATA_BROADCAST_INTENT_CATEGORY);
         fxBroadcastReceiver = new FXBroadcastReceiver();
         registerReceiver(fxBroadcastReceiver, filter);
+
+        IntentFilter filterFXResults = new IntentFilter(FXWedgeConstants.FX_INTENT_ACTION_RESULT);
+        filterFXResults.addCategory(FXWedgeConstants.FX_INTENT_CATEGORY);
+        fxIntentAPIBroadcastReceiver = new FXHardwareSetupActivity.FXIntentAPIBroadcastReceiver();
+        registerReceiver(fxIntentAPIBroadcastReceiver, filterFXResults);
         super.onResume();
     }
 
@@ -529,6 +496,11 @@ public class FXHardwareSetupActivity extends AppCompatActivity {
         {
             unregisterReceiver(fxBroadcastReceiver);
             fxBroadcastReceiver = null;
+        }
+        if(fxIntentAPIBroadcastReceiver != null)
+        {
+            unregisterReceiver(fxIntentAPIBroadcastReceiver);
+            fxIntentAPIBroadcastReceiver = null;
         }
         super.onPause();
     }

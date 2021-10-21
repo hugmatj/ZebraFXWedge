@@ -1,6 +1,7 @@
 package com.zebra.fxwedge;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -260,6 +261,58 @@ public class FXReaderRESTApiFacade {
         return EResult.SUCCESS;
     }
 
+    private String getEnrollToCloudXML()
+    {
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                "<rm:command xmlns:rm=\"urn:epcglobal:rm:xsd:1\" xmlns:epcglobal=\"urn:epcglobal:xsd:1\" xmlns:motorm=\"urn:motorfid:rm:xsd:1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" epcglobal:creationDate=\"2001-12-17T09:30:47.0Z\" epcglobal:schemaVersion=\"0.0\" xsi:schemaLocation=\"urn:epcglobal:rm:xsd:1 ../../../schemas/RmCommand.xsd\">\n" +
+                "   <rm:id>104</rm:id>\n" +
+                "   <rm:targetName />\n" +
+                "   <motorm:readerDevice>\n" +
+                "      <motorm:sessionID>" + sessionID + "</motorm:sessionID>\n" +
+                "      <motorm:enrollToCloud>\n" +
+                "         <motorm:provider>2</motorm:provider>\n" +
+                "         <motorm:code></motorm:code>\n" +
+                "         <motorm:autoConnect>true</motorm:autoConnect>\n" +
+                "      </motorm:enrollToCloud>\n" +
+                "   </motorm:readerDevice>\n" +
+                "</rm:command>";
+    }
+
+    public void enrollToCloud(@NotNull final RESTAPICallCallback callback) {
+        if (sessionID == null || sessionID.isEmpty()) {
+            callback.onRestCallFinished(EResult.ERROR, "No session ID, please Login before trying to enroll FXReader");
+            return;
+        }
+        if (RESTServiceWebServer.isRunning() == false) {
+            callback.onRestCallFinished(EResult.ERROR, "Server must be running before tying to enroll FXReader to obtain local IP address");
+            return;
+        }
+        final RESTAPICallAsync restapiCallAsync = new RESTAPICallAsync(new AsyncTaskCallback() {
+            @Override
+            public void onPostExecute(Response response, Exception exception) {
+                // TODO: Check response message for error or success
+                if(exception != null)
+                {
+                    callback.onRestCallFinished(EResult.ERROR, exception.getMessage());
+                } else if(response.isSuccessful())
+                {
+                    // extract result code
+                    String resultCode = getSetupFxReaderResultCode(response.body().byteStream());
+                    EResult result = resultCode.equalsIgnoreCase("0") ? EResult.SUCCESS : EResult.ERROR;
+                    callback.onRestCallFinished(result, response.message());
+
+                }
+                else
+                {
+                    callback.onRestCallFinished(EResult.ERROR, response.message());
+                }
+
+            }
+        }, null);
+        RESTServiceWebServer.updateIP();
+        String enrollToCloudXMLString = getEnrollToCloudXML();
+        restapiCallAsync.execute("http://" + FXReaderIP + "/control", "POST", "application/xml", enrollToCloudXMLString);
+    }
     public void setupFxReader(@NotNull final RESTAPICallCallback callback)
     {
         if(sessionID == null || sessionID.isEmpty())
@@ -294,8 +347,8 @@ public class FXReaderRESTApiFacade {
             }
         }, null);
         RESTServiceWebServer.updateIP();
-        String setupFX = getSetupFXReaderXMLBody();
-        restapiCallAsync.execute("http://" + FXReaderIP + "/control", "POST", "application/xml", getSetupFXReaderXMLBody());
+        String setupFXXMLString = getSetupFXReaderXMLBody();
+        restapiCallAsync.execute("http://" + FXReaderIP + "/control", "POST", "application/xml", setupFXXMLString);
     }
 
     private String getSetupFXReaderXMLBody() {
@@ -391,92 +444,88 @@ public class FXReaderRESTApiFacade {
         restapiCallAsync.execute("http://" + FXReaderIP + "/cloud/reboot", "PUT", "application/json");
     }
 
-    public static class GetStatusData
-    {
-            public class antennas
-            {
-                @SerializedName("1")
-                public String antenna1 = "disconnected";
-                @SerializedName("2")
-                public String antenna2 = "disconnected";
-                @SerializedName("3")
-                public String antenna3 = "disconnected";
-                @SerializedName("4")
-                public String antenna4 = "disconnected";
-            }
-            public antennas antennas = new antennas();
+    public static class GetStatusData {
+        public class antennas {
+            @SerializedName("1")
+            public String antenna1 = "disconnected";
+            @SerializedName("2")
+            public String antenna2 = "disconnected";
+            @SerializedName("3")
+            public String antenna3 = "disconnected";
+            @SerializedName("4")
+            public String antenna4 = "disconnected";
+        }
 
-            public class cpu
-            {
-                public int system = 8;
-                public int user = 2;
-            }
-            public cpu cpu = new cpu();
+        public antennas antennas = new antennas();
 
-            public class flash
-            {
-                public class platform
-                {
-                    public long free = 0;
-                    public long total = 0;
-                    public long used = 0;
-                }
-                public platform platform = new platform();
+        public class cpu {
+            public int system = 8;
+            public int user = 2;
+        }
 
-                public class readerConfig
-                {
-                    public long free = 0;
-                    public long total = 0;
-                    public long used = 0;
-                }
-                public readerConfig readerConfig = new readerConfig();
+        public cpu cpu = new cpu();
 
-                public class readerData
-                {
-                    public long free = 0;
-                    public long total = 0;
-                    public long used = 0;
-                }
-                public readerData readerData = new readerData();
-
-                public class rootFileSystem
-                {
-                    public long free = 0;
-                    public long total = 0;
-                    public long used = 0;
-                }
-                public rootFileSystem rootFileSystem = new rootFileSystem();
-            }
-
-            public class ntp
-            {
-                double offset = 0.0f;
-                int reach = 0;
-            }
-            public ntp ntp = new ntp();
-
-            String powerNegotiation = "DISABLED";
-            String powerSource = "DC";
-            String radioActivity =  "inactive";
-            String radioConnection =  "connected";
-
-            public class ram
-            {
+        public class flash {
+            public class platform {
                 public long free = 0;
                 public long total = 0;
                 public long used = 0;
             }
 
-            public String systemTime = "2021-10-15T13:58:30Z";
-            public int temperature = 40;
-            public String uptime = "0 days 3:39:47";
+            public platform platform = new platform();
 
-            public static GetStatusData fromJSon(String json)
-            {
-                Gson gson = new Gson();
-                GetStatusData getStatusData = gson.fromJson(new StringReader(json), GetStatusData.class);
-                return getStatusData;
+            public class readerConfig {
+                public long free = 0;
+                public long total = 0;
+                public long used = 0;
             }
+
+            public readerConfig readerConfig = new readerConfig();
+
+            public class readerData {
+                public long free = 0;
+                public long total = 0;
+                public long used = 0;
+            }
+
+            public readerData readerData = new readerData();
+
+            public class rootFileSystem {
+                public long free = 0;
+                public long total = 0;
+                public long used = 0;
+            }
+
+            public rootFileSystem rootFileSystem = new rootFileSystem();
+        }
+
+        public class ntp {
+            double offset = 0.0f;
+            int reach = 0;
+        }
+
+        public ntp ntp = new ntp();
+
+        String powerNegotiation = "DISABLED";
+        String powerSource = "DC";
+        String radioActivity = "inactive";
+        String radioConnection = "connected";
+
+        public class ram {
+            public long free = 0;
+            public long total = 0;
+            public long used = 0;
+        }
+
+        public String systemTime = "2021-10-15T13:58:30Z";
+        public int temperature = 40;
+        public String uptime = "0 days 3:39:47";
+
+        public static GetStatusData fromJSon(String json) {
+            Gson gson = new Gson();
+            GetStatusData getStatusData = gson.fromJson(new StringReader(json), GetStatusData.class);
+            return getStatusData;
+        }
     }
 
     public static class GetSetModeConfig
@@ -500,11 +549,111 @@ public class FXReaderRESTApiFacade {
         public filter filter = new filter();
         public modeSpecificSettings modeSpecificSettings = new modeSpecificSettings();
         public String type = "INVENTORY";
-        protected boolean enableAntenna1 = true;
-        protected boolean enableAntenna2 = true;
-        protected boolean enableAntenna3 = true;
-        protected boolean enableAntenna4 = true;
-        public float transmitPower = 14;
+        public int[] antennas = null;
+        protected boolean enableAntenna1 = false;
+        protected boolean enableAntenna2 = false;
+        protected boolean enableAntenna3 = false;
+        protected boolean enableAntenna4 = false;
+
+        protected float transmitPowerAntenna1 = 10.0f;
+        protected float transmitPowerAntenna2 = 10.0f;
+        protected float transmitPowerAntenna3 = 10.0f;
+        protected float transmitPowerAntenna4 = 10.0f;
+    }
+
+    public static class GetSetModeConfigTF extends GetSetModeConfig
+    {
+        public float transmitPower = 0.0f;
+    }
+
+    public static class GetSetModeConfigTFA extends GetSetModeConfig
+    {
+        public float[] transmitPower = { 0.0f, 0.0f, 0.0f, 0.0f };
+    }
+
+    public static GetSetModeConfig getSetModeConfigFromJSon(String message) {
+        Gson gson = new Gson();
+        try {
+            FXReaderRESTApiFacade.GetSetModeConfigTFA setmodeTFA = gson.fromJson(new StringReader(message), FXReaderRESTApiFacade.GetSetModeConfigTFA.class);
+            if (setmodeTFA != null && setmodeTFA.transmitPower != null) {
+                // Antennas are configured separately
+                // Fill the configuration class with the right values
+                if(setmodeTFA.antennas == null)
+                {
+                    // No antennas specified means that all the antenna are activated by default
+                    setmodeTFA.antennas = new int[]{1,2,3,4};
+                }
+                int index = 0;
+                for (int antenna : setmodeTFA.antennas) {
+                    switch (antenna) {
+                        case 1:
+                            setmodeTFA.enableAntenna1 = true;
+                            setmodeTFA.transmitPowerAntenna1 = setmodeTFA.transmitPower[index];
+                            break;
+                        case 2:
+                            setmodeTFA.enableAntenna2 = true;
+                            setmodeTFA.transmitPowerAntenna2 = setmodeTFA.transmitPower[index];
+                            break;
+                        case 3:
+                            setmodeTFA.enableAntenna3 = true;
+                            setmodeTFA.transmitPowerAntenna3 = setmodeTFA.transmitPower[index];
+                            break;
+                        case 4:
+                            setmodeTFA.enableAntenna4 = true;
+                            setmodeTFA.transmitPowerAntenna4 = setmodeTFA.transmitPower[index];
+                            break;
+                    }
+                    index++;
+                }
+                return setmodeTFA;
+            }
+        }
+        catch(Exception e)
+        {
+            try {
+                FXReaderRESTApiFacade.GetSetModeConfigTF setModeTF = gson.fromJson(new StringReader(message), FXReaderRESTApiFacade.GetSetModeConfigTF.class);
+                if (setModeTF != null) {
+                    if (setModeTF.antennas == null) {
+                        setModeTF.enableAntenna1 = true;
+                        setModeTF.enableAntenna2 = true;
+                        setModeTF.enableAntenna3 = true;
+                        setModeTF.enableAntenna4 = true;
+                        setModeTF.transmitPowerAntenna1 = setModeTF.transmitPower;
+                        setModeTF.transmitPowerAntenna2 = setModeTF.transmitPower;
+                        setModeTF.transmitPowerAntenna3 = setModeTF.transmitPower;
+                        setModeTF.transmitPowerAntenna4 = setModeTF.transmitPower;
+                    } else {
+                        for (int antenna : setModeTF.antennas) {
+                            switch (antenna) {
+                                case 1:
+                                    setModeTF.enableAntenna1 = true;
+                                    setModeTF.transmitPowerAntenna1 = setModeTF.transmitPower;
+                                    break;
+                                case 2:
+                                    setModeTF.enableAntenna2 = true;
+                                    setModeTF.transmitPowerAntenna2 = setModeTF.transmitPower;
+                                    break;
+                                case 3:
+                                    setModeTF.enableAntenna3 = true;
+                                    setModeTF.transmitPowerAntenna3 = setModeTF.transmitPower;
+                                    break;
+                                case 4:
+                                    setModeTF.enableAntenna4 = true;
+                                    setModeTF.transmitPowerAntenna4 = setModeTF.transmitPower;
+                                    break;
+                            }
+                        }
+
+                    }
+                    return setModeTF;
+                }
+            }
+            catch(Exception exp)
+            {
+                return new GetSetModeConfig();
+            }
+        }
+        return null;
     }
 
     private boolean containsAntenna(int antenna, int[] antennas)
@@ -522,9 +671,8 @@ public class FXReaderRESTApiFacade {
         return false;
     }
 
-    public void setMode(@NotNull final RESTAPICallCallback callback, @NotNull final GetSetModeConfig config)
+    private String getAntennaArray(@NotNull final GetSetModeConfig config)
     {
-
         String enableAntennaArray = "";
         if(config.enableAntenna1)
             enableAntennaArray += "        1";
@@ -552,6 +700,45 @@ public class FXReaderRESTApiFacade {
             }
             enableAntennaArray += "        4";
         }
+        return enableAntennaArray;
+    }
+
+    private String getAntennaTransmitPowerArray(@NotNull final GetSetModeConfig config)
+    {
+        String antennaTransmitPowerArray = "";
+        if(config.enableAntenna1)
+            antennaTransmitPowerArray += config.transmitPowerAntenna1;
+        if(config.enableAntenna2)
+        {
+            if(antennaTransmitPowerArray.length() > 0)
+            {
+                antennaTransmitPowerArray += ",\n";
+            }
+            antennaTransmitPowerArray += config.transmitPowerAntenna2;
+        }
+        if(config.enableAntenna3)
+        {
+            if(antennaTransmitPowerArray.length() > 0)
+            {
+                antennaTransmitPowerArray += ",\n";
+            }
+            antennaTransmitPowerArray += config.transmitPowerAntenna3;
+        }
+        if(config.enableAntenna4)
+        {
+            if(antennaTransmitPowerArray.length() > 0)
+            {
+                antennaTransmitPowerArray += ",\n";
+            }
+            antennaTransmitPowerArray += config.transmitPowerAntenna4;
+        }
+        return antennaTransmitPowerArray;
+    }
+
+    public void setMode(@NotNull final RESTAPICallCallback callback, @NotNull final GetSetModeConfig config)
+    {
+        String enableAntennaArray = getAntennaArray(config);
+        String antennaTransmitPowerArray = getAntennaTransmitPowerArray(config);
         final RESTAPICallAsync restapiCallAsync = new RESTAPICallAsync(null, callback);
         String setModeJSon = "{\n" +
                 "    \"mode\": \"" + config.type + "\",\n" +
@@ -567,7 +754,9 @@ public class FXReaderRESTApiFacade {
                 "        \"unit\": \""+ config.modeSpecificSettings.interval.unit + "\",\n" +
                 "        \"value\": "+ config.modeSpecificSettings.interval.value + "\n" +
                 "    },\n" +
-                "    \"transmitPower\": "+ config.transmitPower + "\n" +
+                "    \"transmitPower\": [\n"+
+                    antennaTransmitPowerArray +
+                "    ]\n" +
                 "}";
         Log.d(TAG, "setModeJSon: " + setModeJSon);
 

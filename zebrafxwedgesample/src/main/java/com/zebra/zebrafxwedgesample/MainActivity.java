@@ -25,9 +25,7 @@ public class MainActivity extends AppCompatActivity {
     private String mResults = "";
     private boolean mOptmizeRefresh = true;
     private CheckBox cb_displayReadings = null;
-    private Button bt_login = null;
     private Button bt_setup = null;
-    private Button bt_reboot = null;
     private Button bt_start = null;
     private Button bt_stop = null;
     private Button bt_clear = null;
@@ -82,27 +80,12 @@ public class MainActivity extends AppCompatActivity {
         sv_results = (ScrollView)findViewById(R.id.sv_results);
         cb_displayReadings = (CheckBox)findViewById(R.id.cb_showreadings);
 
-        bt_login = (Button)findViewById(R.id.bt_login);
-        bt_login.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sendIntent(FXWedgeConstants.FX_INTENT_ACTION_LOGIN);
-            }
-        });
-
         bt_setup = (Button)findViewById(R.id.bt_setup);
         bt_setup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendIntent(FXWedgeConstants.FX_INTENT_ACTION_SETUP);
-            }
-        });
-
-        bt_reboot = (Button)findViewById(R.id.bt_reboot);
-        bt_reboot.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sendIntent(FXWedgeConstants.FX_INTENT_ACTION_REBOOT);
+                Intent intent = new Intent(MainActivity.this, FXHardwareSetupActivity.class);
+                startActivity(intent);
             }
         });
 
