@@ -2,6 +2,7 @@
     <string name="app_name">Zebra FXWedge</string>
     <string name="zebra_enterprise_services_notification_title">Zebra FXWedge</string>
     <string name="zebra_enterprise_services_notification_text">A service that allow to control and use Zebra\'s FX Readers using Intents.</string>
+    <string name="zebra_enterprise_services_notification_text_onlyzebra">FXWedge only runs on Zebra Devices.\nContact your local Zebra office for more information.\nwww.zebra.com</string>
     <string name="zebra_enterprise_services_notification_tickle">ZebraFXWedge</string>
     <string name="serviceStopped">Service is stopped</string>
     <string name="serviceStarted">Service is running</string>

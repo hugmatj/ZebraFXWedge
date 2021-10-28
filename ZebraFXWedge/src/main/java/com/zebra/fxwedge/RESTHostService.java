@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
@@ -61,6 +62,7 @@ public class RESTHostService extends Service {
     @SuppressLint({"Wakelock"})
     private void startService()
     {
+        boolean isZebraDevice = ZebraDeviceHelper.isZebraDevice(this);
         logD("startService");
         try
         {
@@ -78,7 +80,7 @@ public class RESTHostService extends Service {
             mNotification = notificationBuilder.setOngoing(true)
                     .setSmallIcon(R.mipmap.ic_launcher)
                     .setContentTitle(getString(R.string.zebra_enterprise_services_notification_title))
-                    .setContentText(getString(R.string.zebra_enterprise_services_notification_text))
+                    .setContentText(isZebraDevice ? getString(R.string.zebra_enterprise_services_notification_text) : getString(R.string.zebra_enterprise_services_notification_text_onlyzebra))
                     .setTicker(getString(R.string.zebra_enterprise_services_notification_tickle))
                     .setPriority(PRIORITY_MIN)
                     .setCategory(NotificationCompat.CATEGORY_SERVICE)
@@ -90,71 +92,36 @@ public class RESTHostService extends Service {
             localTaskStackBuilder.addNextIntent(mainActivityIntent);
             notificationBuilder.setContentIntent(localTaskStackBuilder.getPendingIntent(0, FLAG_UPDATE_CURRENT));
 
-            // Start foreground service
-            startForeground(SERVICE_ID, mNotification);
+            if(isZebraDevice) {
+                // Start foreground service
+                startForeground(SERVICE_ID, mNotification);
 
-            // Launch web server here
-            if(mRESTServer != null)
-            {
-                mRESTServer.closeAllConnections();
-                mRESTServer.stop();
-                mRESTServer = null;
+                // Launch web server here
+                if (mRESTServer != null) {
+                    mRESTServer.closeAllConnections();
+                    mRESTServer.stop();
+                    mRESTServer = null;
+                }
+
+                mRESTServer = new RESTServiceWebServer(RESTServiceWebServer.mServerPort, getBaseContext());
+                mRESTServer.start();
+                logD("startService:Service started without error.");
             }
-
-            mRESTServer = new RESTServiceWebServer(RESTServiceWebServer.mServerPort, getBaseContext());
-            mRESTServer.start();
-
-            //mFxReaderRESTApiFacade = new FXReaderRESTApiFacade(getBaseContext());
-            // initiate connexion with FXReader
-            //mFxReaderRESTApiFacade.login(new FXReaderRESTApiFacade.RESTAPICallCallback() {
-            //    @Override
-            //    public void onRestCallFinished(FXReaderRESTApiFacade.EResult result, String message) {
-            //        Log.d(FXReaderRESTApiFacade.TAG, result == FXReaderRESTApiFacade.EResult.SUCCESS ? "Login successfull" : "Login error");
-            //        Log.d(FXReaderRESTApiFacade.TAG, "Session ID: " + FXReaderRESTApiFacade.sessionID);
-            //        // Setup FX Reader
-            //        mFxReaderRESTApiFacade.setupFxReader(new FXReaderRESTApiFacade.RESTAPICallCallback() {
-            //            @Override
-            //            public void onRestCallFinished(FXReaderRESTApiFacade.EResult result, String message) {
-            //                Log.d(FXReaderRESTApiFacade.TAG, result == FXReaderRESTApiFacade.EResult.SUCCESS ? "setup successfull" : "setup error");
-            //                Log.d(FXReaderRESTApiFacade.TAG, "Message: " + message);
-            //            }
-            //        });
-            //    }
-            //});
-
-            //mFxReaderRESTApiFacade.startReading(new FXReaderRESTApiFacade.RESTAPICallCallback() {
-            //    @Override
-            //    public void onRestCallFinished(FXReaderRESTApiFacade.EResult result, String message) {
-            //        Log.d(FXReaderRESTApiFacade.TAG, result == FXReaderRESTApiFacade.EResult.SUCCESS ? "Start read successfull" : "Start read error");
-            //        Log.d(FXReaderRESTApiFacade.TAG, "Result: " + message);
-            //        // let's start again the reader to get an error
-            //        mFxReaderRESTApiFacade.startReading(new FXReaderRESTApiFacade.RESTAPICallCallback() {
-            //            @Override
-            //            public void onRestCallFinished(FXReaderRESTApiFacade.EResult result, String message) {
-            //                Log.d(FXReaderRESTApiFacade.TAG, result == FXReaderRESTApiFacade.EResult.SUCCESS ? "Start read successfull" : "Start read error");
-            //                Log.d(FXReaderRESTApiFacade.TAG, "Result: " + message);
-            //                // Let's stop the reader
-            //                mFxReaderRESTApiFacade.stopReading(new FXReaderRESTApiFacade.RESTAPICallCallback() {
-            //                    @Override
-            //                    public void onRestCallFinished(FXReaderRESTApiFacade.EResult result, String message) {
-            //                        Log.d(FXReaderRESTApiFacade.TAG, result == FXReaderRESTApiFacade.EResult.SUCCESS ? "Stop read successfull" : "Stop read error");
-            //                        Log.d(FXReaderRESTApiFacade.TAG, "Result: " + message);
-            //                    }
-            //                });
-            //            }
-            //        });
-            //    }
-            //});
-            
-            logD("startService:Service started without error.");
+            else
+            {
+                logD(getString(R.string.zebra_enterprise_services_notification_text_onlyzebra));
+                stopService();
+                if(RESTHostServiceActivity.mMainActivity != null)
+                {
+                    RESTHostServiceActivity.mMainActivity.updateSwitches();
+                }
+            }
         }
         catch(Exception e)
         {
             logD("startService:Error while starting service.");
             e.printStackTrace();
         }
-
-
     }
 
     private void stopService()

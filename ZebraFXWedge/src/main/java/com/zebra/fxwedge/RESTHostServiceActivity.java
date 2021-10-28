@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -60,10 +62,16 @@ public class RESTHostServiceActivity extends AppCompatActivity {
     protected static RESTHostServiceActivity mMainActivity;
     private RESTHostServiceNetworkStateObserver mIPChangeObserver = null;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if(ZebraDeviceHelper.isZebraDevice(this) == false)
+        {
+            setContentView(R.layout.activity_onlyonzebradevices);
+            return;
+        }
+
         setContentView(R.layout.activity_restservice);
 
         mStartStopServiceSwitch = (Switch)findViewById(R.id.startStopServiceSwitch);
@@ -101,25 +109,24 @@ public class RESTHostServiceActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        mMainActivity = this;
-        if(mIPChangeObserver == null)
-        {
-            mIPChangeObserver = new RESTHostServiceNetworkStateObserver(getApplicationContext(), new RESTHostServiceNetworkStateObserver.IIPChangeObserver() {
-                @Override
-                public void onIPChanged(String newIP) {
-                    updateIP();
-                }
-            });
+        if(ZebraDeviceHelper.isZebraDevice(this)) {
+            mMainActivity = this;
+            if (mIPChangeObserver == null) {
+                mIPChangeObserver = new RESTHostServiceNetworkStateObserver(getApplicationContext(), new RESTHostServiceNetworkStateObserver.IIPChangeObserver() {
+                    @Override
+                    public void onIPChanged(String newIP) {
+                        updateIP();
+                    }
+                });
 
-            mIPChangeObserver.startObserver();
-        }
-        else if(mIPChangeObserver.isStarted() == false)
-        {
-            mIPChangeObserver.startObserver();
+                mIPChangeObserver.startObserver();
+            } else if (mIPChangeObserver.isStarted() == false) {
+                mIPChangeObserver.startObserver();
+            }
+            updateSwitches();
+            updateIP();
         }
         super.onResume();
-        updateSwitches();
-        updateIP();
     }
 
     protected void updateSwitches()
@@ -138,12 +145,13 @@ public class RESTHostServiceActivity extends AppCompatActivity {
     protected void onPause() {
         mMainActivity = null;
         super.onPause();
-        // Stop observing IP Changes
-        if(mIPChangeObserver != null && mIPChangeObserver.isStarted())
-        {
-            mIPChangeObserver.stopObserver();
+        if(ZebraDeviceHelper.isZebraDevice(this)) {
+            // Stop observing IP Changes
+            if (mIPChangeObserver != null && mIPChangeObserver.isStarted()) {
+                mIPChangeObserver.stopObserver();
+            }
+            mIPChangeObserver = null;
         }
-        mIPChangeObserver = null;
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -155,13 +163,31 @@ public class RESTHostServiceActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menuitem_fxwedgesetup:
-                startActivity(new Intent(RESTHostServiceActivity.this, FXWedgeSetupActivity.class));
+                if(ZebraDeviceHelper.isZebraDevice(this)) {
+                    startActivity(new Intent(RESTHostServiceActivity.this, FXWedgeSetupActivity.class));
+                }
+                else
+                {
+                    Toast.makeText(this, getString(R.string.zebra_enterprise_services_notification_text_onlyzebra), Toast.LENGTH_LONG).show();
+                }
                 break;
             case R.id.menuitem_setupfxhardware:
-                startActivity(new Intent(RESTHostServiceActivity.this, FXHardwareSetupActivity.class));
+                if(ZebraDeviceHelper.isZebraDevice(this)) {
+                    startActivity(new Intent(RESTHostServiceActivity.this, FXHardwareSetupActivity.class));
+                }
+                else
+                {
+                    Toast.makeText(this, getString(R.string.zebra_enterprise_services_notification_text_onlyzebra), Toast.LENGTH_LONG).show();
+                }
                 break;
             case R.id.menuitem_test:
-                startActivity(new Intent(RESTHostServiceActivity.this, RestHostServiceTestActivity.class));
+                if(ZebraDeviceHelper.isZebraDevice(this)) {
+                    startActivity(new Intent(RESTHostServiceActivity.this, RestHostServiceTestActivity.class));
+                }
+                else
+                {
+                    Toast.makeText(this, getString(R.string.zebra_enterprise_services_notification_text_onlyzebra), Toast.LENGTH_LONG).show();
+                }
                 break;
             case R.id.menuitem_license:
                 startActivity(new Intent(RESTHostServiceActivity.this, LicenceActivity.class));
