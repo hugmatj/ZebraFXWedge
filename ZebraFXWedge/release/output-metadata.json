@@ -4,15 +4,15 @@
     "type": "APK",
     "kind": "Directory"
   },
-  "applicationId": "com.zebra.fxwedge",
+  "applicationId": "com.zebra.zebrafxwedgesample",
   "variantName": "processReleaseResources",
   "elements": [
     {
       "type": "SINGLE",
       "filters": [],
-      "versionCode": 3,
-      "versionName": "1.2",
-      "outputFile": "ZebraFXWedge-release.apk"
+      "versionCode": 1,
+      "versionName": "1.0",
+      "outputFile": "zebrafxwedgesample-release.apk"
     }
   ]
 }
