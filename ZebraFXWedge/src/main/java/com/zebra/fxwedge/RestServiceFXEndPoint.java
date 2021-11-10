@@ -22,8 +22,8 @@ import okhttp3.Response;
 
 public class RestServiceFXEndPoint implements RESTServiceInterface{
     private Context mContext = null;
-    public static String mForwardIP = "192.168.4.199";
-    public static int mForwardPort = 5000;
+    public static String mForwardIP = "sms.ckpfra.ovh";
+    public static int mForwardPort = 1706;
     public static boolean mEnableForwarding = false;
 
     protected static String TAG = "FXEP";
@@ -32,8 +32,8 @@ public class RestServiceFXEndPoint implements RESTServiceInterface{
         mContext = context;
         SharedPreferences sharedpreferences = context.getSharedPreferences(RESTHostServiceConstants.SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
         mEnableForwarding = sharedpreferences.getBoolean(RESTHostServiceConstants.SHARED_PREFERENCES_FORWARDING_ENABLED, false);
-        mForwardIP = sharedpreferences.getString(RESTHostServiceConstants.SHARED_PREFERENCES_FORWARDING_IP, "192.168.4.199");
-        mForwardPort = sharedpreferences.getInt(RESTHostServiceConstants.SHARED_PREFERENCES_FORWARDING_PORT, 5000);
+        mForwardIP = sharedpreferences.getString(RESTHostServiceConstants.SHARED_PREFERENCES_FORWARDING_IP, "sms.ckpfra.ovh");
+        mForwardPort = sharedpreferences.getInt(RESTHostServiceConstants.SHARED_PREFERENCES_FORWARDING_PORT, 1706);
     }
 
     @Override
@@ -91,11 +91,12 @@ public class RestServiceFXEndPoint implements RESTServiceInterface{
         RequestBody body = RequestBody.create(postData, mediaType);
 
         Request.Builder okHttpBuilder = new Request.Builder();
-        okHttpBuilder = okHttpBuilder.url("http://" + mForwardIP + ":" + String.valueOf(mForwardPort) + "/");
+        okHttpBuilder = okHttpBuilder.url("http://" + mForwardIP + ":" + String.valueOf(mForwardPort) + "");
         okHttpBuilder = okHttpBuilder.method(session.getMethod().name(), body);
 
-        okHttpBuilder = okHttpBuilder.addHeader("remote-addr", RESTServiceWebServer.mCurrentIP);
-        okHttpBuilder = okHttpBuilder.addHeader("http-client-ip", RESTServiceWebServer.mCurrentIP);
+        okHttpBuilder = okHttpBuilder.addHeader("remote-addr", session.getRemoteIpAddress());
+        okHttpBuilder = okHttpBuilder.addHeader("remote-host", session.getRemoteHostName());
+        okHttpBuilder = okHttpBuilder.addHeader("http-client-ip", session.getRemoteIpAddress());
         okHttpBuilder = okHttpBuilder.addHeader("host", mForwardIP + ":" + String.valueOf(mForwardPort));
         okHttpBuilder = okHttpBuilder.addHeader("accept", "*/*");
 
