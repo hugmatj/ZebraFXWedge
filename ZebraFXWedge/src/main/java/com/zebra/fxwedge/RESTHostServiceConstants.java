@@ -13,14 +13,20 @@ public class RESTHostServiceConstants {
     protected static final String SHARED_PREFERENCES_FX_LOGIN = "admin";
     protected static final String SHARED_PREFERENCES_FX_PASSWORD = "change";
     protected static final String SHARED_PREFERENCES_SERVER_PORT = "serverport";
+    protected static final String SHARED_PREFERENCES_FORWARDING_ENABLED = "forwardingenabled";
+    protected static final String SHARED_PREFERENCES_FORWARDING_IP = "forwardingip";
+    protected static final String SHARED_PREFERENCES_FORWARDING_PORT = "forwardingport";
 
-    // Intent extras keys
+    // Intent settings xtras keys
     protected static final String EXTRA_CONFIGURATION_START_ON_BOOT = "startonboot";
     protected static final String EXTRA_CONFIGURATION_SET_FX_IP = "setfxip";
     protected static final String EXTRA_CONFIGURATION_SET_FX_NAME = "setfxname";
     protected static final String EXTRA_CONFIGURATION_SET_SERVER_PORT = "serverport";
     protected static final String EXTRA_CONFIGURATION_SET_FXLOGIN = "login";
     protected static final String EXTRA_CONFIGURATION_SET_FXPASSWORD = "password";
+    protected static final String EXTRA_CONFIGURATION_SET_FORWARDING_ENABLED = "forwardingenabled";
+    protected static final String EXTRA_CONFIGURATION_SET_FORWARDING_IP = "forwardingip";
+    protected static final String EXTRA_CONFIGURATION_SET_FORWARDING_PORT = "forwardingport";
 
     // Server configuration
     protected static final String SERVER_CORS_ALLOWED_METHODS = "GET, POST, PUT, DELETE, OPTIONS, HEAD";

@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Switch;
@@ -22,6 +23,9 @@ public class FXWedgeSetupActivity extends AppCompatActivity {
     private EditText mFXLogin = null;
     private EditText mFXPassword = null;
     private Button mButtonSave = null;
+    private CheckBox mEnableForwarding = null;
+    private EditText mForwardIP = null;
+    private EditText mForwardPort = null;
 
     public static FXWedgeSetupActivity mMainActivity = null;
 
@@ -57,6 +61,9 @@ public class FXWedgeSetupActivity extends AppCompatActivity {
         mServerPortTextView = (EditText)findViewById(R.id.et_serverport);
         mFXLogin = (EditText)findViewById(R.id.et_fxlogin);
         mFXPassword = (EditText)findViewById(R.id.et_fxpassword);
+        mEnableForwarding = (CheckBox)findViewById(R.id.cb_allow_forwarding);
+        mForwardIP = (EditText)findViewById(R.id.et_forwardip);
+        mForwardPort = (EditText)findViewById(R.id.et_forwardport);
 
         SharedPreferences sharedpreferences = getSharedPreferences(RESTHostServiceConstants.SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
 
@@ -78,6 +85,15 @@ public class FXWedgeSetupActivity extends AppCompatActivity {
         String FXPassword = sharedpreferences.getString(RESTHostServiceConstants.SHARED_PREFERENCES_FX_PASSWORD, "change");
         mFXPassword.setText(FXPassword);
 
+        Boolean enableForwarding = sharedpreferences.getBoolean(RESTHostServiceConstants.SHARED_PREFERENCES_FORWARDING_ENABLED, false);
+        mEnableForwarding.setChecked(enableForwarding);
+
+        String ForwardIP = sharedpreferences.getString(RESTHostServiceConstants.SHARED_PREFERENCES_FORWARDING_IP, "192.168.4.199");
+        mForwardIP.setText(ForwardIP);
+
+        int ForwardPort = sharedpreferences.getInt(RESTHostServiceConstants.SHARED_PREFERENCES_FORWARDING_PORT, 5000);
+        mForwardPort.setText(String.valueOf(ForwardPort));
+
         mButtonSave = (Button)findViewById(R.id.bt_save);
         mButtonSave.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -94,9 +110,18 @@ public class FXWedgeSetupActivity extends AppCompatActivity {
         editor.putBoolean(RESTHostServiceConstants.SHARED_PREFERENCES_START_SERVICE_ON_BOOT, mAutoStartServiceOnBootSwitch.isChecked());
         editor.putString(RESTHostServiceConstants.SHARED_PREFERENCES_FX_NAME, mFXName.getText().toString());
         editor.putString(RESTHostServiceConstants.SHARED_PREFERENCES_FX_IP, mFXIPTextView.getText().toString());
+        RESTServiceWebServer.mFXIp = mFXIPTextView.getText().toString();
         editor.putString(RESTHostServiceConstants.SHARED_PREFERENCES_FX_LOGIN, mFXLogin.getText().toString());
         editor.putString(RESTHostServiceConstants.SHARED_PREFERENCES_FX_PASSWORD, mFXPassword.getText().toString());
+        editor.putString(RESTHostServiceConstants.SHARED_PREFERENCES_FORWARDING_IP, mForwardIP.getText().toString());
+        RestServiceFXEndPoint.mForwardIP = mForwardIP.getText().toString();
+        int forwardPort = Integer.valueOf(mForwardPort.getText().toString());
+        RestServiceFXEndPoint.mForwardPort = forwardPort;
+        editor.putInt(RESTHostServiceConstants.SHARED_PREFERENCES_FORWARDING_PORT, forwardPort);
+        editor.putBoolean(RESTHostServiceConstants.SHARED_PREFERENCES_FORWARDING_ENABLED, mEnableForwarding.isChecked());
+        RestServiceFXEndPoint.mEnableForwarding = mEnableForwarding.isChecked();
         int serverPort = Integer.valueOf(mServerPortTextView.getText().toString());
+        RESTServiceWebServer.mServerPort = serverPort;
         editor.putInt(RESTHostServiceConstants.SHARED_PREFERENCES_SERVER_PORT, serverPort);
         editor.commit();
         Toast.makeText(FXWedgeSetupActivity.this, getString(R.string.configsaved), Toast.LENGTH_SHORT).show();
@@ -223,5 +248,57 @@ public class FXWedgeSetupActivity extends AppCompatActivity {
         });
     }
 
+    // Update GUI controls only if the activity exists
+    public static void updateForwardIPIfNecessary()
+    {
+        // Update GUI if necessary
+        if(FXWedgeSetupActivity.mMainActivity != null) // The application default activity has been opened
+        {
+            FXWedgeSetupActivity.mMainActivity.updateForwardIPTextView();
+        }
+    }
+
+    private void updateForwardIPTextView() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mForwardIP.setText(RestServiceFXEndPoint.mForwardIP);
+            }
+        });
+
+    }
+    public static void updateForwardPortIfNecessary() {
+        // Update GUI if necessary
+        if(FXWedgeSetupActivity.mMainActivity != null) // The application default activity has been opened
+        {
+            FXWedgeSetupActivity.mMainActivity.updateForwardPortTextView();
+        }
+    }
+
+    private void updateForwardPortTextView() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mForwardPort.setText(String.valueOf(RestServiceFXEndPoint.mForwardPort));
+            }
+        });
+    }
+
+    public static void updateEnableForwardIfNecessary() {
+        // Update GUI if necessary
+        if(FXWedgeSetupActivity.mMainActivity != null) // The application default activity has been opened
+        {
+            FXWedgeSetupActivity.mMainActivity.updateEnableForwardCheckBox();
+        }
+    }
+
+    private void updateEnableForwardCheckBox() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mEnableForwarding.setChecked(RestServiceFXEndPoint.mEnableForwarding);
+            }
+        });
+    }
 
 }

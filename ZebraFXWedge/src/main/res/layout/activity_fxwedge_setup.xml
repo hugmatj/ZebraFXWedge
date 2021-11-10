@@ -146,12 +146,72 @@
         android:text="change"
         android:textSize="24sp" />
 
+    <CheckBox
+        android:id="@+id/cb_allow_forwarding"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/et_fxpassword"
+        android:layout_marginTop="5dp"
+        android:text="Forward FXData"
+        android:textSize="24sp" />
+
+    <TextView
+        android:id="@+id/tv_forwardIP"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/cb_allow_forwarding"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:text="Forward IP: "
+        android:textSize="24sp" />
+
+    <EditText
+        android:id="@+id/et_forwardip"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/cb_allow_forwarding"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_toLeftOf="@id/tv_forwardIP"
+        android:layout_toEndOf="@+id/tv_forwardIP"
+        android:layout_toRightOf="@+id/tv_forwardIP"
+        android:text="127.0.0.1"
+        android:textSize="24sp" />
+
+    <TextView
+        android:id="@+id/tv_forwardport"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_forwardIP"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:text="Forward Port: "
+        android:textSize="24sp" />
+
+    <EditText
+        android:id="@+id/et_forwardport"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_forwardIP"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_toLeftOf="@id/tv_forwardport"
+        android:layout_toEndOf="@+id/tv_forwardport"
+        android:layout_toRightOf="@+id/tv_forwardport"
+        android:text="5000"
+        android:textSize="24sp" />
+
     <Button
         android:id="@+id/bt_save"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/et_fxpassword"
-        android:layout_marginTop="30dp"
+        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp"
         android:text="Save Config" />
 </RelativeLayout>

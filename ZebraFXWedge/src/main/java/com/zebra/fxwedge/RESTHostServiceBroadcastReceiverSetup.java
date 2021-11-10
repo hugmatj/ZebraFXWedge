@@ -104,6 +104,53 @@ public class RESTHostServiceBroadcastReceiverSetup extends BroadcastReceiver {
             Log.d(RESTHostServiceConstants.TAG, "RESTHostServiceBroadcastReceiverSetup::onReceive:No FX password extra found.");
         }
 
+        String setForwardIP = intent.getExtras().getString(RESTHostServiceConstants.EXTRA_CONFIGURATION_SET_FORWARDING_IP, null);
+        if(setForwardIP != null)
+        {
+            Log.d(RESTHostServiceConstants.TAG, "RESTHostServiceBroadcastReceiverSetup::onReceive:Set Forward IP extra found with value:" + setForwardIP);
+            setSharedPreference(context, RESTHostServiceConstants.SHARED_PREFERENCES_FORWARDING_IP, setForwardIP);
+            // Update rest server if launched
+            RestServiceFXEndPoint.mForwardIP = setForwardIP;
+            // Update GUI if necessary
+            FXWedgeSetupActivity.updateForwardIPIfNecessary();
+        }
+        else
+        {
+            Log.d(RESTHostServiceConstants.TAG, "RESTHostServiceBroadcastReceiverSetup::onReceive:No forward IPs extra found.");
+        }
+
+        String setForwardPort = intent.getExtras().getString(RESTHostServiceConstants.EXTRA_CONFIGURATION_SET_FORWARDING_PORT, null);
+        if(setForwardPort != null)
+        {
+            Log.d(RESTHostServiceConstants.TAG, "RESTHostServiceBroadcastReceiverSetup::onReceive:Set Forward Port extra found with value:" + setForwardPort);
+            int forwardPort = Integer.valueOf(setForwardPort);
+            setSharedPreference(context, RESTHostServiceConstants.SHARED_PREFERENCES_FORWARDING_PORT, forwardPort);
+            // Update rest server if launched
+            RestServiceFXEndPoint.mForwardPort = forwardPort;
+            // Update GUI if necessary
+            FXWedgeSetupActivity.updateForwardPortIfNecessary();
+        }
+        else
+        {
+            Log.d(RESTHostServiceConstants.TAG, "RESTHostServiceBroadcastReceiverSetup::onReceive:No forward port extra found.");
+        }
+
+
+        String setEnableForward = intent.getExtras().getString(RESTHostServiceConstants.EXTRA_CONFIGURATION_SET_FORWARDING_ENABLED, null);
+        if(setEnableForward != null)
+        {
+            Log.d(RESTHostServiceConstants.TAG, "RESTHostServiceBroadcastReceiverSetup::onReceive:Set Enable Forward extra found with value:" + setEnableForward);
+            boolean enableForward = Boolean.valueOf(setEnableForward);
+            setSharedPreference(context, RESTHostServiceConstants.SHARED_PREFERENCES_FORWARDING_ENABLED, enableForward);
+            // Update rest server if launched
+            RestServiceFXEndPoint.mEnableForwarding = enableForward;
+            // Update GUI if necessary
+            FXWedgeSetupActivity.updateEnableForwardIfNecessary();
+        }
+        else
+        {
+            Log.d(RESTHostServiceConstants.TAG, "RESTHostServiceBroadcastReceiverSetup::onReceive:No enable forward extra found.");
+        }
     }
 
     private void setSharedPreference(Context context, String key, boolean value)
