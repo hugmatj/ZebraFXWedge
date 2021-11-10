@@ -15,9 +15,6 @@ import android.widget.CheckBox;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import org.epctagcoder.parse.GRAI.ParseGRAI;
-import org.epctagcoder.result.GRAI;
-
 public class MainActivity extends AppCompatActivity {
 
     /*
@@ -51,18 +48,6 @@ public class MainActivity extends AppCompatActivity {
                 FXReadsDataModel data = FXReadsDataModel.fromBundle(extraDataBundle);
                 if (data != null)
                     addLineToResults(data.toString());
-                ParseGRAI parseGRAI = null;
-                try {
-                    parseGRAI = ParseGRAI.Builder()
-                            .withRFIDTag(data.data.idHex)
-                            .build();
-                    GRAI grai = parseGRAI.getGRAI();
-                    String assetType = grai.getAssetType();
-                addLineToResults("Asset type:" + assetType);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
             }
         }
     }
