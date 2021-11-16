@@ -61,7 +61,7 @@ public class RestServiceFXEndPoint implements RESTServiceInterface{
             json = files.get("postData");
 
             if(json.isEmpty() == false)
-                broadcastJSONData(json);
+                broadcastJSONData(session, json);
 
             //Log.w(TAG, "json " + json);
         }
@@ -72,14 +72,14 @@ public class RestServiceFXEndPoint implements RESTServiceInterface{
         return new Pair<>(RESTServiceWebServer.EJobStatus.SUCCEEDED, json);
     }
 
-    private void broadcastJSONData(String json) {
+    private void broadcastJSONData(NanoHTTPD.IHTTPSession session,String json) {
         FXReadsDataModel data = new Gson().fromJson(json, FXReadsDataModel.class);
         Log.v(TAG, "Read data: \n" + data.toString());
         Intent intent = new Intent(RESTHostServiceConstants.FXDATA_BROADCAST_INTENT_ACTION);
         intent.addCategory(RESTHostServiceConstants.FXDATA_BROADCAST_INTENT_CATEGORY);
         intent.putExtra(RESTHostServiceConstants.FXDATA_BROADCAST_INTENT_EXTRA_READDATA, data.toBundle());
-        intent.putExtra(RESTHostServiceConstants.FXDATA_BROADCAST_INTENT_EXTRA_SOURCENAME, FXReaderRESTApiFacade.FXName);
-        intent.putExtra(RESTHostServiceConstants.FXDATA_BROADCAST_INTENT_EXTRA_SOURCEIP, FXReaderRESTApiFacade.FXReaderIP);
+        intent.putExtra(RESTHostServiceConstants.FXDATA_BROADCAST_INTENT_EXTRA_SOURCENAME, session.getRemoteHostName());
+        intent.putExtra(RESTHostServiceConstants.FXDATA_BROADCAST_INTENT_EXTRA_SOURCEIP, session.getRemoteIpAddress());
         mContext.sendBroadcast(intent);
     }
 
