@@ -39,6 +39,8 @@ public class RESTHostServiceConstants {
     protected static final String FXDATA_BROADCAST_INTENT_ACTION = "com.zebra.fxwedge.DATA";
 
     // Broadcast intent extra values
+    protected static final String FXDATA_BROADCAST_INTENT_EXTRA_SOURCENAME = "readername";
+    protected static final String FXDATA_BROADCAST_INTENT_EXTRA_SOURCEIP = "readerip";
     protected static final String FXDATA_BROADCAST_INTENT_EXTRA_READDATA = "readdata";
     protected static final String FXDATA_BROADCAST_INTENT_EXTRA_DATA = "data";
     protected static final String FXDATA_BROADCAST_INTENT_EXTRA_ANTENNA = "antenna";

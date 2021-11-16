@@ -78,6 +78,8 @@ public class RestServiceFXEndPoint implements RESTServiceInterface{
         Intent intent = new Intent(RESTHostServiceConstants.FXDATA_BROADCAST_INTENT_ACTION);
         intent.addCategory(RESTHostServiceConstants.FXDATA_BROADCAST_INTENT_CATEGORY);
         intent.putExtra(RESTHostServiceConstants.FXDATA_BROADCAST_INTENT_EXTRA_READDATA, data.toBundle());
+        intent.putExtra(RESTHostServiceConstants.FXDATA_BROADCAST_INTENT_EXTRA_SOURCENAME, FXReaderRESTApiFacade.FXName);
+        intent.putExtra(RESTHostServiceConstants.FXDATA_BROADCAST_INTENT_EXTRA_SOURCEIP, FXReaderRESTApiFacade.FXReaderIP);
         mContext.sendBroadcast(intent);
     }
 

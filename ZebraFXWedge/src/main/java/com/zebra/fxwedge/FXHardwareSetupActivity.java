@@ -73,8 +73,13 @@ public class FXHardwareSetupActivity extends AppCompatActivity {
             if(cb_displayReadings.isChecked()) {
                 Bundle extraDataBundle = intent.getBundleExtra(RESTHostServiceConstants.FXDATA_BROADCAST_INTENT_EXTRA_READDATA);
                 FXReadsDataModel data = FXReadsDataModel.fromBundle(extraDataBundle);
-                if (data != null)
+                if (data != null) {
+                    String sourceName = intent.getStringExtra(RESTHostServiceConstants.FXDATA_BROADCAST_INTENT_EXTRA_SOURCENAME);
+                    String sourceIP = intent.getStringExtra(RESTHostServiceConstants.FXDATA_BROADCAST_INTENT_EXTRA_SOURCEIP);
+                    addLineToResults("Source name: " + sourceName);
+                    addLineToResults("Source IP: " + sourceIP);
                     addLineToResults(data.toString());
+                }
             }
         }
     }
