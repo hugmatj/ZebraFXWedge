@@ -98,6 +98,7 @@ public class RestServiceFXEndPoint implements RESTServiceInterface{
         okHttpBuilder = okHttpBuilder.addHeader("remote-host", session.getRemoteHostName());
         okHttpBuilder = okHttpBuilder.addHeader("http-client-ip", session.getRemoteIpAddress());
         okHttpBuilder = okHttpBuilder.addHeader("host", mForwardIP + ":" + String.valueOf(mForwardPort));
+        okHttpBuilder = okHttpBuilder.addHeader("fxforward", FXReaderRESTApiFacade.FXName);
         okHttpBuilder = okHttpBuilder.addHeader("accept", "*/*");
 
         request = okHttpBuilder.build();
