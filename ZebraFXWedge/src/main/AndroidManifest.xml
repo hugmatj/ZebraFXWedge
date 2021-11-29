@@ -10,6 +10,9 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <uses-permission android:name="com.zebra.provider.READ"/>
+    <uses-permission android:name="com.symbol.emdk.permission.EMDK" />
+
     <application
         android:allowBackup="true"
         android:debuggable="true"
@@ -20,6 +23,7 @@
         android:usesCleartextTraffic="true"
         android:theme="@style/AppTheme"
         tools:ignore="HardcodedDebugMode">
+        <uses-library android:name="com.symbol.emdk" />
         <activity
             android:name=".FXWedgeSetupActivity"
             android:exported="true" />

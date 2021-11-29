@@ -14,6 +14,9 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 public class FXWedgeSetupActivity extends AppCompatActivity {
 
     private Switch mAutoStartServiceOnBootSwitch = null;
@@ -26,6 +29,9 @@ public class FXWedgeSetupActivity extends AppCompatActivity {
     private CheckBox mEnableForwarding = null;
     private EditText mForwardIP = null;
     private EditText mForwardPort = null;
+    private CheckBox mEnableIOTAForwarding = null;
+    private EditText mIOTAForwardingAPIKey = null;
+    private EditText mIOTAForwardingEndpoint = null;
 
     public static FXWedgeSetupActivity mMainActivity = null;
 
@@ -64,6 +70,9 @@ public class FXWedgeSetupActivity extends AppCompatActivity {
         mEnableForwarding = (CheckBox)findViewById(R.id.cb_allow_forwarding);
         mForwardIP = (EditText)findViewById(R.id.et_forwardip);
         mForwardPort = (EditText)findViewById(R.id.et_forwardport);
+        mEnableIOTAForwarding = (CheckBox)findViewById(R.id.cb_allow_iotaforwarding);
+        mIOTAForwardingAPIKey = (EditText)findViewById(R.id.et_apikey);
+        mIOTAForwardingEndpoint = (EditText)findViewById(R.id.et_iotaserver);
 
         SharedPreferences sharedpreferences = getSharedPreferences(RESTHostServiceConstants.SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
 
@@ -94,6 +103,15 @@ public class FXWedgeSetupActivity extends AppCompatActivity {
         int ForwardPort = sharedpreferences.getInt(RESTHostServiceConstants.SHARED_PREFERENCES_FORWARDING_PORT, 5000);
         mForwardPort.setText(String.valueOf(ForwardPort));
 
+        Boolean enableIOTAForwarding = sharedpreferences.getBoolean(RESTHostServiceConstants.SHARED_PREFERENCES_IOTAFORWARDING_ENABLED, false);
+        mEnableIOTAForwarding.setChecked(enableIOTAForwarding);
+
+        String ApiKeyIOTA = sharedpreferences.getString(RESTHostServiceConstants.SHARED_PREFERENCES_IOTAFORWARDING_APIKEY, "EbJbpyTL9C1oBXTYy5GxWhKk8AKNSM4n");
+        mIOTAForwardingAPIKey.setText(ApiKeyIOTA);
+
+        String EndpointIOTA = sharedpreferences.getString(RESTHostServiceConstants.SHARED_PREFERENCES_IOTAFORWARDING_ENDPOINT, "https://sandbox-api.zebra.com/v2/ledger/tangle");
+        mIOTAForwardingEndpoint.setText(EndpointIOTA);
+
         mButtonSave = (Button)findViewById(R.id.bt_save);
         mButtonSave.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -110,21 +128,37 @@ public class FXWedgeSetupActivity extends AppCompatActivity {
         editor.putBoolean(RESTHostServiceConstants.SHARED_PREFERENCES_START_SERVICE_ON_BOOT, mAutoStartServiceOnBootSwitch.isChecked());
         editor.putString(RESTHostServiceConstants.SHARED_PREFERENCES_FX_NAME, mFXName.getText().toString());
         editor.putString(RESTHostServiceConstants.SHARED_PREFERENCES_FX_IP, mFXIPTextView.getText().toString());
-        RESTServiceWebServer.mFXIp = mFXIPTextView.getText().toString();
         editor.putString(RESTHostServiceConstants.SHARED_PREFERENCES_FX_LOGIN, mFXLogin.getText().toString());
         editor.putString(RESTHostServiceConstants.SHARED_PREFERENCES_FX_PASSWORD, mFXPassword.getText().toString());
         editor.putString(RESTHostServiceConstants.SHARED_PREFERENCES_FORWARDING_IP, mForwardIP.getText().toString());
-        RestServiceFXEndPoint.mForwardIP = mForwardIP.getText().toString();
         int forwardPort = Integer.valueOf(mForwardPort.getText().toString());
-        RestServiceFXEndPoint.mForwardPort = forwardPort;
         editor.putInt(RESTHostServiceConstants.SHARED_PREFERENCES_FORWARDING_PORT, forwardPort);
         editor.putBoolean(RESTHostServiceConstants.SHARED_PREFERENCES_FORWARDING_ENABLED, mEnableForwarding.isChecked());
-        RestServiceFXEndPoint.mEnableForwarding = mEnableForwarding.isChecked();
         int serverPort = Integer.valueOf(mServerPortTextView.getText().toString());
-        RESTServiceWebServer.mServerPort = serverPort;
         editor.putInt(RESTHostServiceConstants.SHARED_PREFERENCES_SERVER_PORT, serverPort);
+        editor.putString(RESTHostServiceConstants.SHARED_PREFERENCES_IOTAFORWARDING_ENDPOINT, mIOTAForwardingEndpoint.getText().toString());
+        editor.putBoolean(RESTHostServiceConstants.SHARED_PREFERENCES_IOTAFORWARDING_ENABLED, mEnableIOTAForwarding.isChecked());
+        editor.putString(RESTHostServiceConstants.SHARED_PREFERENCES_IOTAFORWARDING_APIKEY, mIOTAForwardingAPIKey.getText().toString());
         editor.commit();
         Toast.makeText(FXWedgeSetupActivity.this, getString(R.string.configsaved), Toast.LENGTH_SHORT).show();
+        updateUglyStatics();
+    }
+
+    private void updateUglyStatics()
+    {
+        RESTServiceWebServer.mFXIp = mFXIPTextView.getText().toString();
+        RESTServiceWebServer.mServerPort = Integer.valueOf(mServerPortTextView.getText().toString());;
+        RestServiceFXEndPoint.mForwardIP = mForwardIP.getText().toString();
+        RestServiceFXEndPoint.mForwardPort = Integer.valueOf(mForwardPort.getText().toString());;
+        RestServiceFXEndPoint.mEnableForwarding = mEnableForwarding.isChecked();
+        RestServiceFXEndPoint.mEnableIOTAForwarding = mEnableIOTAForwarding.isChecked();
+        RestServiceFXEndPoint.mIOTAForwardingKey = mIOTAForwardingAPIKey.getText().toString();
+        RestServiceFXEndPoint.mIOTAForwardingEndPoint = mIOTAForwardingEndpoint.getText().toString();
+        try {
+            RestServiceFXEndPoint.mFXNameEncoded = URLEncoder.encode(mFXName.getText().toString(),"UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            RestServiceFXEndPoint.mFXNameEncoded = "";
+        }
     }
 
     private void setAutoStartServiceOnBootSwitch(final boolean checked)
@@ -300,5 +334,60 @@ public class FXWedgeSetupActivity extends AppCompatActivity {
             }
         });
     }
+
+
+    public static void updateEnableIOTAForwardIfNecessary() {
+        // Update GUI if necessary
+        if(FXWedgeSetupActivity.mMainActivity != null) // The application default activity has been opened
+        {
+            FXWedgeSetupActivity.mMainActivity.updateEnableIOTAForwardCheckBox();
+        }
+    }
+
+    private void updateEnableIOTAForwardCheckBox() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mEnableIOTAForwarding.setChecked(RestServiceFXEndPoint.mEnableIOTAForwarding);
+            }
+        });
+    }
+
+
+    public static void updateIOTAApiKeyIfNecessary() {
+        // Update GUI if necessary
+        if(FXWedgeSetupActivity.mMainActivity != null) // The application default activity has been opened
+        {
+            FXWedgeSetupActivity.mMainActivity.updateEnableIOTAForwardAPIKey();
+        }
+    }
+
+    private void updateEnableIOTAForwardAPIKey() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mIOTAForwardingAPIKey.setText(RestServiceFXEndPoint.mIOTAForwardingKey);
+            }
+        });
+    }
+
+
+    public static void updateIOTAEndPointIfNecessary() {
+        // Update GUI if necessary
+        if(FXWedgeSetupActivity.mMainActivity != null) // The application default activity has been opened
+        {
+            FXWedgeSetupActivity.mMainActivity.updateEnableIOTAEndPoint();
+        }
+    }
+
+    private void updateEnableIOTAEndPoint() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mIOTAForwardingEndpoint.setText(RestServiceFXEndPoint.mIOTAForwardingEndPoint);
+            }
+        });
+    }
+
 
 }

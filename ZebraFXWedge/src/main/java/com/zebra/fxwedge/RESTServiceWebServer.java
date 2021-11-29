@@ -38,6 +38,7 @@ public class RESTServiceWebServer extends NanoHTTPD {
         mFXIp = sharedpreferences.getString(RESTHostServiceConstants.SHARED_PREFERENCES_FX_IP, "192.168.4.80");
         mServerPort = sharedpreferences.getInt(RESTHostServiceConstants.SHARED_PREFERENCES_SERVER_PORT, 5000);
         mFXEndPoint = new RestServiceFXEndPoint(context);
+        ZebraDeviceHelper.getDeviceSerialNumber(context, null);
     }
 
     public static void updateIP()
@@ -54,8 +55,8 @@ public class RESTServiceWebServer extends NanoHTTPD {
     }
 
     @Override
-    public void start() throws IOException {
-        super.start();
+    public void start(final int timeout) throws IOException {
+        super.start(timeout, true);
         if(mIPChangeObserver == null)
         {
             // We launch the observer but we do not need to be notified here if the IP change

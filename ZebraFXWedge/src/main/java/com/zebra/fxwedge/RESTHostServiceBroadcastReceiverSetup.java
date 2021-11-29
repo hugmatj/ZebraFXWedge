@@ -151,6 +151,52 @@ public class RESTHostServiceBroadcastReceiverSetup extends BroadcastReceiver {
         {
             Log.d(RESTHostServiceConstants.TAG, "RESTHostServiceBroadcastReceiverSetup::onReceive:No enable forward extra found.");
         }
+
+        String setEnableIOTAForward = intent.getExtras().getString(RESTHostServiceConstants.EXTRA_CONFIGURATION_SET_IOTAFORWARDING_ENABLED, null);
+        if(setEnableIOTAForward != null)
+        {
+            Log.d(RESTHostServiceConstants.TAG, "RESTHostServiceBroadcastReceiverSetup::onReceive:Set Enable IOTA Forward extra found with value:" + setEnableIOTAForward);
+            boolean enableIOTAForward = Boolean.valueOf(setEnableIOTAForward);
+            setSharedPreference(context, RESTHostServiceConstants.SHARED_PREFERENCES_IOTAFORWARDING_ENABLED, enableIOTAForward);
+            // Update rest server if launched
+            RestServiceFXEndPoint.mEnableIOTAForwarding = enableIOTAForward;
+            // Update GUI if necessary
+            FXWedgeSetupActivity.updateEnableIOTAForwardIfNecessary();
+        }
+        else
+        {
+            Log.d(RESTHostServiceConstants.TAG, "RESTHostServiceBroadcastReceiverSetup::onReceive:No enable IOTA forward extra found.");
+        }
+
+        String setIOTAForwardAPIKey = intent.getExtras().getString(RESTHostServiceConstants.EXTRA_CONFIGURATION_SET_IOTAFORWARDING_APIKEY, null);
+        if(setIOTAForwardAPIKey != null)
+        {
+            Log.d(RESTHostServiceConstants.TAG, "RESTHostServiceBroadcastReceiverSetup::onReceive:Set IOTA Forward API Key extra found with value:" + setIOTAForwardAPIKey);
+            setSharedPreference(context, RESTHostServiceConstants.SHARED_PREFERENCES_IOTAFORWARDING_APIKEY, setIOTAForwardAPIKey);
+            // Update rest server if launched
+            RestServiceFXEndPoint.mIOTAForwardingKey = setIOTAForwardAPIKey;
+            // Update GUI if necessary
+            FXWedgeSetupActivity.updateIOTAApiKeyIfNecessary();
+        }
+        else
+        {
+            Log.d(RESTHostServiceConstants.TAG, "RESTHostServiceBroadcastReceiverSetup::onReceive:No IOTA forward API Key extra found.");
+        }
+
+        String setIOTAForwardEndPoint = intent.getExtras().getString(RESTHostServiceConstants.EXTRA_CONFIGURATION_SET_IOTAFORWARDING_ENDPOINT, null);
+        if(setIOTAForwardEndPoint != null)
+        {
+            Log.d(RESTHostServiceConstants.TAG, "RESTHostServiceBroadcastReceiverSetup::onReceive:Set IOTA Forward Endpoint extra found with value:" + setIOTAForwardEndPoint);
+            setSharedPreference(context, RESTHostServiceConstants.SHARED_PREFERENCES_IOTAFORWARDING_ENDPOINT, setIOTAForwardEndPoint);
+            // Update rest server if launched
+            RestServiceFXEndPoint.mIOTAForwardingEndPoint = setIOTAForwardEndPoint;
+            // Update GUI if necessary
+            FXWedgeSetupActivity.updateIOTAEndPointIfNecessary();
+        }
+        else
+        {
+            Log.d(RESTHostServiceConstants.TAG, "RESTHostServiceBroadcastReceiverSetup::onReceive:No IOTA forward Endpoint extra found.");
+        }
     }
 
     private void setSharedPreference(Context context, String key, boolean value)

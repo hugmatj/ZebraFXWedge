@@ -9,10 +9,14 @@ import android.util.Pair;
 import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
 import fi.iki.elonen.NanoHTTPD;
+import okhttp3.Call;
+import okhttp3.Callback;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -25,6 +29,11 @@ public class RestServiceFXEndPoint implements RESTServiceInterface{
     public static String mForwardIP = "sms.ckpfra.ovh";
     public static int mForwardPort = 1706;
     public static boolean mEnableForwarding = false;
+    public static String mFXNameEncoded = "";
+
+    public static boolean mEnableIOTAForwarding = false;
+    public static String mIOTAForwardingKey = "EbJbpyTL9C1oBXTYy5GxWhKk8AKNSM4n";
+    public static String mIOTAForwardingEndPoint = "https://sandbox-api.zebra.com/v2/ledger/tangle";
 
     protected static String TAG = "FXEP";
 
@@ -34,6 +43,14 @@ public class RestServiceFXEndPoint implements RESTServiceInterface{
         mEnableForwarding = sharedpreferences.getBoolean(RESTHostServiceConstants.SHARED_PREFERENCES_FORWARDING_ENABLED, false);
         mForwardIP = sharedpreferences.getString(RESTHostServiceConstants.SHARED_PREFERENCES_FORWARDING_IP, "sms.ckpfra.ovh");
         mForwardPort = sharedpreferences.getInt(RESTHostServiceConstants.SHARED_PREFERENCES_FORWARDING_PORT, 1706);
+        try {
+            mFXNameEncoded = URLEncoder.encode(sharedpreferences.getString(RESTHostServiceConstants.SHARED_PREFERENCES_FX_NAME, "FX7500"),"UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            mFXNameEncoded = "";
+        }
+        mEnableIOTAForwarding = sharedpreferences.getBoolean(RESTHostServiceConstants.SHARED_PREFERENCES_IOTAFORWARDING_ENABLED, false);
+        mIOTAForwardingKey = sharedpreferences.getString(RESTHostServiceConstants.SHARED_PREFERENCES_IOTAFORWARDING_APIKEY, "EbJbpyTL9C1oBXTYy5GxWhKk8AKNSM4n");
+        mIOTAForwardingEndPoint = sharedpreferences.getString(RESTHostServiceConstants.SHARED_PREFERENCES_IOTAFORWARDING_ENDPOINT, "https://sandbox-api.zebra.com/v2/ledger/tangle");
     }
 
     @Override
@@ -63,11 +80,15 @@ public class RestServiceFXEndPoint implements RESTServiceInterface{
             if(json.isEmpty() == false)
                 broadcastJSONData(session, json);
 
+            if(mEnableForwarding )
+                forwardSession(session, files);
+
+            if(mEnableIOTAForwarding)
+                IOTAHelpers.forwardSessionToIOTA(session, files, mIOTAForwardingEndPoint, mIOTAForwardingKey);
             //Log.w(TAG, "json " + json);
         }
 
-        if(mEnableForwarding && files.size() > 0)
-            forwardSession(session, files);
+
 
         return new Pair<>(RESTServiceWebServer.EJobStatus.SUCCEEDED, json);
     }
@@ -83,7 +104,7 @@ public class RestServiceFXEndPoint implements RESTServiceInterface{
         mContext.sendBroadcast(intent);
     }
 
-    private Response forwardSession(NanoHTTPD.IHTTPSession session, Map<String, String> files)
+    private boolean forwardSession(NanoHTTPD.IHTTPSession session, Map<String, String> files)
     {
         OkHttpClient client = new OkHttpClient();
         HttpUrl endPointURL = HttpUrl.parse(session.getUri());
@@ -100,18 +121,33 @@ public class RestServiceFXEndPoint implements RESTServiceInterface{
         okHttpBuilder = okHttpBuilder.addHeader("remote-host", session.getRemoteHostName());
         okHttpBuilder = okHttpBuilder.addHeader("http-client-ip", session.getRemoteIpAddress());
         okHttpBuilder = okHttpBuilder.addHeader("host", mForwardIP + ":" + String.valueOf(mForwardPort));
-        okHttpBuilder = okHttpBuilder.addHeader("fxforward", FXReaderRESTApiFacade.FXName);
+        okHttpBuilder = okHttpBuilder.addHeader("fxforward", mFXNameEncoded);
         okHttpBuilder = okHttpBuilder.addHeader("accept", "*/*");
 
         request = okHttpBuilder.build();
 
-        try {
             Log.d(TAG, "Forward request: " + request.toString());
-            Response response = client.newCall(request).execute();
-            Log.d(TAG, "Forward response: " + response.message());
-            return response;
-        } catch (IOException e) {
-            return null;
-        }
+
+            client.newCall(request)
+                    .enqueue(new Callback() {
+                        @Override
+                        public void onFailure(final Call call, IOException e) {
+                            // Error
+                            Log.d(TAG, "Forward Request failure: " + e.getMessage());
+                        }
+
+                        @Override
+                        public void onResponse(Call call, final Response response) throws IOException {
+                            String res = response.body().string();
+
+                            Log.d(TAG, "Forward response: " + response.message());
+                        }
+                    });
+
+            //Response response = client.newCall(request).execute();
+
+            return true;
     }
+
+
 }

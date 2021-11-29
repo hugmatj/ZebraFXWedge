@@ -15,6 +15,16 @@
         android:layout_marginTop="10dp"
         android:text="Setup\nFX Reader" />
 
+    <Button
+        android:id="@+id/bt_beep"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_toLeftOf="@id/bt_setup"
+        android:layout_toEndOf="@+id/bt_setup"
+        android:layout_toRightOf="@+id/bt_setup"
+        android:text="Beep" />
 
     <Button
         android:id="@+id/bt_start"

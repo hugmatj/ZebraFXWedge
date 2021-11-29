@@ -16,6 +16,9 @@ public class RESTHostServiceConstants {
     protected static final String SHARED_PREFERENCES_FORWARDING_ENABLED = "forwardingenabled";
     protected static final String SHARED_PREFERENCES_FORWARDING_IP = "forwardingip";
     protected static final String SHARED_PREFERENCES_FORWARDING_PORT = "forwardingport";
+    protected static final String SHARED_PREFERENCES_IOTAFORWARDING_ENABLED = "iotaforwardingenabled";
+    protected static final String SHARED_PREFERENCES_IOTAFORWARDING_APIKEY = "iotaforwardingapikey";
+    protected static final String SHARED_PREFERENCES_IOTAFORWARDING_ENDPOINT = "iotaforwardingendpoint";
 
     // Intent settings xtras keys
     protected static final String EXTRA_CONFIGURATION_START_ON_BOOT = "startonboot";
@@ -27,6 +30,9 @@ public class RESTHostServiceConstants {
     protected static final String EXTRA_CONFIGURATION_SET_FORWARDING_ENABLED = "forwardingenabled";
     protected static final String EXTRA_CONFIGURATION_SET_FORWARDING_IP = "forwardingip";
     protected static final String EXTRA_CONFIGURATION_SET_FORWARDING_PORT = "forwardingport";
+    protected static final String EXTRA_CONFIGURATION_SET_IOTAFORWARDING_ENABLED = "iotaforwardingenabled";
+    protected static final String EXTRA_CONFIGURATION_SET_IOTAFORWARDING_APIKEY = "iotaforwardingapikey";
+    protected static final String EXTRA_CONFIGURATION_SET_IOTAFORWARDING_ENDPOINT = "iotaforwardingendpoint";
 
     // Server configuration
     protected static final String SERVER_CORS_ALLOWED_METHODS = "GET, POST, PUT, DELETE, OPTIONS, HEAD";
@@ -52,6 +58,7 @@ public class RESTHostServiceConstants {
     protected static final String FXDATA_BROADCAST_INTENT_EXTRA_TIMESTAMP = "timestamp";
     protected static final String FXDATA_BROADCAST_INTENT_EXTRA_TYPE = "type";
     protected static final String FXDATA_BROADCAST_INTENT_EXTRA_TIMESTAMP_DATEFORMAT = "yyyy-MM-dd HH:mm:ss z";
+    protected static final String FXDATA_IOTA_FORWARDING_TIMESTAMP_DATEFORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 
     // FX Intent Commands
     protected static final String FX_INTENT_CATEGORY = "android.intent.category.DEFAULT";

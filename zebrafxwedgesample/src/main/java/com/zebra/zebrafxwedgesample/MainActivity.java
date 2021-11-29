@@ -6,6 +6,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.AudioManager;
+import android.media.ToneGenerator;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -116,6 +118,14 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 mResults = "";
                 et_results.setText(mResults);
+            }
+        });
+
+        ((Button)findViewById(R.id.bt_beep)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ToneGenerator toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, ToneGenerator.MAX_VOLUME);
+                toneGen1.startTone(ToneGenerator.TONE_CDMA_HIGH_L,100);
             }
         });
     }

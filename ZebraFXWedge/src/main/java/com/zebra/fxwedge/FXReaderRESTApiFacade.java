@@ -53,6 +53,11 @@ public class FXReaderRESTApiFacade {
     protected FXReaderRESTApiFacade(Context context)
     {
         this.context = context;
+        initialize(context);
+    }
+
+    public static void initialize(Context context)
+    {
         SharedPreferences sharedpreferences = context.getSharedPreferences(RESTHostServiceConstants.SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
         FXReaderIP = sharedpreferences.getString(RESTHostServiceConstants.SHARED_PREFERENCES_FX_IP, "192.168.4.80");
         FXLogin = sharedpreferences.getString(RESTHostServiceConstants.SHARED_PREFERENCES_FX_LOGIN, "admin");

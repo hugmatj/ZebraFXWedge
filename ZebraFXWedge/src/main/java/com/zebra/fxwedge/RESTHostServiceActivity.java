@@ -14,6 +14,9 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.zebra.deviceidentifierswrapper.DIHelper;
+import com.zebra.deviceidentifierswrapper.IDIResultCallbacks;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 // The service can be launched using the graphical user interface, intent actions or adb.
@@ -59,6 +62,7 @@ import androidx.appcompat.app.AppCompatActivity;
 public class RESTHostServiceActivity extends AppCompatActivity {
     private Switch mStartStopServiceSwitch = null;
     private TextView mDeviceIPTextView = null;
+    private TextView mDeviceSerialNumber = null;
     protected static RESTHostServiceActivity mMainActivity;
     private RESTHostServiceNetworkStateObserver mIPChangeObserver = null;
 
@@ -96,6 +100,7 @@ public class RESTHostServiceActivity extends AppCompatActivity {
         });
 
         mDeviceIPTextView = (TextView)findViewById(R.id.tv_ip);
+        mDeviceSerialNumber = (TextView)findViewById(R.id.tv_serial);
 
         SharedPreferences sharedpreferences = getSharedPreferences(RESTHostServiceConstants.SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
         boolean startServiceOnBoot = sharedpreferences.getBoolean(RESTHostServiceConstants.SHARED_PREFERENCES_START_SERVICE_ON_BOOT, false);
@@ -125,8 +130,42 @@ public class RESTHostServiceActivity extends AppCompatActivity {
             }
             updateSwitches();
             updateIP();
+            updateSerialNumber();
         }
         super.onResume();
+    }
+
+    protected void updateSerialNumber()
+    {
+        DIHelper.getSerialNumber(this, new IDIResultCallbacks() {
+            @Override
+            public void onSuccess(String message) {
+                final String fMessage = message;
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mDeviceSerialNumber.setText("Device Serial: " + fMessage);
+                        ZebraDeviceHelper.mDeviceSerialNumber = fMessage;
+                    }
+                });
+            }
+
+            @Override
+            public void onError(String message) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mDeviceSerialNumber.setText("Device Serial: " + "Error retrieving serial number");
+                    }
+                });
+            }
+
+            @Override
+            public void onDebugStatus(String message) {
+
+            }
+        });
+
     }
 
     protected void updateSwitches()

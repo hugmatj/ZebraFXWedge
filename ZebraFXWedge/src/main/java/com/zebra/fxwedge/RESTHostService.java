@@ -104,7 +104,7 @@ public class RESTHostService extends Service {
                 }
 
                 mRESTServer = new RESTServiceWebServer(RESTServiceWebServer.mServerPort, getBaseContext());
-                mRESTServer.start();
+                mRESTServer.start(-1);
                 logD("startService:Service started without error.");
             }
             else

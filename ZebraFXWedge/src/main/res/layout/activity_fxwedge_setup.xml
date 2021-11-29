@@ -206,6 +206,61 @@
         android:text="5000"
         android:textSize="24sp" />
 
+    <CheckBox
+        android:id="@+id/cb_allow_iotaforwarding"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/et_forwardport"
+        android:layout_marginTop="5dp"
+        android:text="Forward to IOTA"
+        android:textSize="24sp" />
+
+    <TextView
+        android:id="@+id/tv_iotaserver"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/cb_allow_iotaforwarding"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:text="IOTA Server: "
+        android:textSize="24sp" />
+
+    <EditText
+        android:id="@+id/et_iotaserver"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_iotaserver"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:text="https://sandbox-api.zebra.com/v2/ledger/tangle"
+        android:textSize="24sp" />
+
+    <TextView
+        android:id="@+id/tv_apikey"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/et_iotaserver"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:text="API Key: "
+        android:textSize="24sp" />
+
+    <EditText
+        android:id="@+id/et_apikey"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_apikey"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:text="EbJbpyTL9C1oBXTYy5GxWhKk8AKNSM4n"
+        android:textSize="24sp" />
+
     <Button
         android:id="@+id/bt_save"
         android:layout_width="wrap_content"

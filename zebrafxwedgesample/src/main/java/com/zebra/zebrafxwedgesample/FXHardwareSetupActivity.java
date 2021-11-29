@@ -319,6 +319,8 @@ public class FXHardwareSetupActivity extends AppCompatActivity {
         bt_getConnectedAntennas.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // TODO: implement get mode
+
                 addLineToResults("Get antenna status (connected/disconnected) : NOT IMPLEMENTED NOW");
             }
         });
