@@ -15,7 +15,6 @@ public class RESTServiceWebServer extends NanoHTTPD {
 
     private Context mContext = null;
     private static RESTHostServiceNetworkStateObserver mIPChangeObserver = null;
-    protected static String mCurrentIP = "";
     private static boolean mStopServing = false;
 
     protected enum EJobStatus
@@ -26,8 +25,6 @@ public class RESTServiceWebServer extends NanoHTTPD {
         CUSTOM
     }
 
-    protected static String mFXIp = "192.168.4.80";
-    protected static int mServerPort = 5000;
 
     private RestServiceFXEndPoint mFXEndPoint;
 
@@ -35,8 +32,8 @@ public class RESTServiceWebServer extends NanoHTTPD {
         super(port);
         mContext = context;
         SharedPreferences sharedpreferences = context.getSharedPreferences(RESTHostServiceConstants.SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
-        mFXIp = sharedpreferences.getString(RESTHostServiceConstants.SHARED_PREFERENCES_FX_IP, "192.168.4.80");
-        mServerPort = sharedpreferences.getInt(RESTHostServiceConstants.SHARED_PREFERENCES_SERVER_PORT, 5000);
+        FXWedgeStaticConfig.mFXIp = sharedpreferences.getString(RESTHostServiceConstants.SHARED_PREFERENCES_FX_IP, "192.168.4.80");
+        FXWedgeStaticConfig.mServerPort = sharedpreferences.getInt(RESTHostServiceConstants.SHARED_PREFERENCES_SERVER_PORT, 5000);
         mFXEndPoint = new RestServiceFXEndPoint(context);
         ZebraDeviceHelper.getDeviceSerialNumber(context, null);
     }
@@ -45,7 +42,7 @@ public class RESTServiceWebServer extends NanoHTTPD {
     {
         if(mIPChangeObserver != null)
         {
-            mCurrentIP = mIPChangeObserver.getIPAddress();
+            FXWedgeStaticConfig.mCurrentIP = mIPChangeObserver.getIPAddress();
         }
     }
 
@@ -68,13 +65,13 @@ public class RESTServiceWebServer extends NanoHTTPD {
                         // This means we are actually getting a new IP but the IP resolution is not finished
                         // We block any request from the webpage
                         mStopServing = true;
-                        mCurrentIP = "0.0.0.0";
+                        FXWedgeStaticConfig.mCurrentIP = "0.0.0.0";
                     }
-                    if(newIP.equalsIgnoreCase("0.0.0.0") == false && newIP.equalsIgnoreCase(mCurrentIP) == false) {
+                    if(newIP.equalsIgnoreCase("0.0.0.0") == false && newIP.equalsIgnoreCase(FXWedgeStaticConfig.mCurrentIP) == false) {
                         // If the IP has changed, we need to restart the server and unstop the service if necessary
                         mStopServing = true;
                         try {
-                            mCurrentIP = newIP;
+                            FXWedgeStaticConfig.mCurrentIP = newIP;
                             //Thread.sleep(2000);
                             mStopServing = false;
                         } catch (Exception e) {
@@ -117,7 +114,7 @@ public class RESTServiceWebServer extends NanoHTTPD {
             return resp;
         }
         // Check if the remote IP is equal to the device IP
-        if(session.getRemoteIpAddress().equalsIgnoreCase(mFXIp) == false)
+        if(session.getRemoteIpAddress().equalsIgnoreCase(FXWedgeStaticConfig.mFXIp) == false)
         {
             responseJSON= "{\n \"result\": \"error\",\n \"message\":\"Trying to access to the webservice from a different IP than the FX Reader IP. Check FX IP configuration in settings.\"\n}";
         }

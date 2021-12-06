@@ -2,18 +2,29 @@ package com.zebra.fxwedge;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.location.Location;
 import android.os.Bundle;
+import android.os.Looper;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Switch;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
+
+import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
@@ -26,15 +37,24 @@ public class FXWedgeSetupActivity extends AppCompatActivity {
     private EditText mFXLogin = null;
     private EditText mFXPassword = null;
     private Button mButtonSave = null;
+    private Button mButtonImportConfig = null;
+    private Button mButtonExportConfig = null;
+    private Button mButtonDeleteConfig = null;
+    private Button mButtonGetLocation = null;
     private CheckBox mEnableForwarding = null;
     private EditText mForwardIP = null;
     private EditText mForwardPort = null;
     private CheckBox mEnableIOTAForwarding = null;
     private EditText mIOTAForwardingAPIKey = null;
     private EditText mIOTAForwardingEndpoint = null;
+    private EditText mDeviceLatitude = null;
+    private EditText mDeviceLongitude = null;
 
     public static FXWedgeSetupActivity mMainActivity = null;
 
+    private FusedLocationProviderClient fusedLocationClient;
+    private LocationCallback locationCallback;
+    private LocationRequest locationRequest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,121 +63,239 @@ public class FXWedgeSetupActivity extends AppCompatActivity {
 
         mMainActivity = this;
 
-        mAutoStartServiceOnBootSwitch = (Switch)findViewById(R.id.startOnBootSwitch);
+        mAutoStartServiceOnBootSwitch = (Switch) findViewById(R.id.startOnBootSwitch);
         mAutoStartServiceOnBootSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked)
-                {
+                if (isChecked) {
                     mAutoStartServiceOnBootSwitch.setText(getString(R.string.startOnBoot));
-                }
-                else
-                {
+                } else {
                     mAutoStartServiceOnBootSwitch.setText(getString(R.string.doNothingOnBoot));
                 }
                 SharedPreferences sharedpreferences = getSharedPreferences(RESTHostServiceConstants.SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedpreferences.edit();
                 editor.putBoolean(RESTHostServiceConstants.SHARED_PREFERENCES_START_SERVICE_ON_BOOT, isChecked);
                 editor.commit();
+                FXWedgeStaticConfig.getFromSharedPreferences(FXWedgeSetupActivity.this);
             }
         });
 
-        mFXName = (EditText)findViewById(R.id.et_fxname);
-        mFXIPTextView = (EditText)findViewById(R.id.et_fxip);
-        mServerPortTextView = (EditText)findViewById(R.id.et_serverport);
-        mFXLogin = (EditText)findViewById(R.id.et_fxlogin);
-        mFXPassword = (EditText)findViewById(R.id.et_fxpassword);
-        mEnableForwarding = (CheckBox)findViewById(R.id.cb_allow_forwarding);
-        mForwardIP = (EditText)findViewById(R.id.et_forwardip);
-        mForwardPort = (EditText)findViewById(R.id.et_forwardport);
-        mEnableIOTAForwarding = (CheckBox)findViewById(R.id.cb_allow_iotaforwarding);
-        mIOTAForwardingAPIKey = (EditText)findViewById(R.id.et_apikey);
-        mIOTAForwardingEndpoint = (EditText)findViewById(R.id.et_iotaserver);
+        mFXName = (EditText) findViewById(R.id.et_fxname);
+        mFXIPTextView = (EditText) findViewById(R.id.et_fxip);
+        mServerPortTextView = (EditText) findViewById(R.id.et_serverport);
+        mFXLogin = (EditText) findViewById(R.id.et_fxlogin);
+        mFXPassword = (EditText) findViewById(R.id.et_fxpassword);
+        mEnableForwarding = (CheckBox) findViewById(R.id.cb_allow_forwarding);
+        mForwardIP = (EditText) findViewById(R.id.et_forwardip);
+        mForwardPort = (EditText) findViewById(R.id.et_forwardport);
+        mEnableIOTAForwarding = (CheckBox) findViewById(R.id.cb_allow_iotaforwarding);
+        mIOTAForwardingAPIKey = (EditText) findViewById(R.id.et_apikey);
+        mIOTAForwardingEndpoint = (EditText) findViewById(R.id.et_iotaserver);
+        mDeviceLatitude = (EditText) findViewById(R.id.et_latitude);
+        mDeviceLongitude = (EditText) findViewById(R.id.et_longitude);
 
-        SharedPreferences sharedpreferences = getSharedPreferences(RESTHostServiceConstants.SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
+        FXWedgeStaticConfig.getFromSharedPreferences(this);
+        updateUIElements();
 
-        String FXName = sharedpreferences.getString(RESTHostServiceConstants.SHARED_PREFERENCES_FX_NAME, "FX7500FCDA1B");
-        mFXName.setText(FXName);
-
-        String FXIp = sharedpreferences.getString(RESTHostServiceConstants.SHARED_PREFERENCES_FX_IP, "192.168.4.80");
-        mFXIPTextView.setText(FXIp);
-
-        int ServerPort = sharedpreferences.getInt(RESTHostServiceConstants.SHARED_PREFERENCES_SERVER_PORT, 5000);
-        mServerPortTextView.setText(String.valueOf(ServerPort));
-
-        boolean startServiceOnBoot = sharedpreferences.getBoolean(RESTHostServiceConstants.SHARED_PREFERENCES_START_SERVICE_ON_BOOT, false);
-        setAutoStartServiceOnBootSwitch(startServiceOnBoot);
-
-        String FXLogin = sharedpreferences.getString(RESTHostServiceConstants.SHARED_PREFERENCES_FX_LOGIN, "admin");
-        mFXLogin.setText(FXLogin);
-
-        String FXPassword = sharedpreferences.getString(RESTHostServiceConstants.SHARED_PREFERENCES_FX_PASSWORD, "change");
-        mFXPassword.setText(FXPassword);
-
-        Boolean enableForwarding = sharedpreferences.getBoolean(RESTHostServiceConstants.SHARED_PREFERENCES_FORWARDING_ENABLED, false);
-        mEnableForwarding.setChecked(enableForwarding);
-
-        String ForwardIP = sharedpreferences.getString(RESTHostServiceConstants.SHARED_PREFERENCES_FORWARDING_IP, "192.168.4.199");
-        mForwardIP.setText(ForwardIP);
-
-        int ForwardPort = sharedpreferences.getInt(RESTHostServiceConstants.SHARED_PREFERENCES_FORWARDING_PORT, 5000);
-        mForwardPort.setText(String.valueOf(ForwardPort));
-
-        Boolean enableIOTAForwarding = sharedpreferences.getBoolean(RESTHostServiceConstants.SHARED_PREFERENCES_IOTAFORWARDING_ENABLED, false);
-        mEnableIOTAForwarding.setChecked(enableIOTAForwarding);
-
-        String ApiKeyIOTA = sharedpreferences.getString(RESTHostServiceConstants.SHARED_PREFERENCES_IOTAFORWARDING_APIKEY, "EbJbpyTL9C1oBXTYy5GxWhKk8AKNSM4n");
-        mIOTAForwardingAPIKey.setText(ApiKeyIOTA);
-
-        String EndpointIOTA = sharedpreferences.getString(RESTHostServiceConstants.SHARED_PREFERENCES_IOTAFORWARDING_ENDPOINT, "https://sandbox-api.zebra.com/v2/ledger/tangle");
-        mIOTAForwardingEndpoint.setText(EndpointIOTA);
-
-        mButtonSave = (Button)findViewById(R.id.bt_save);
+        mButtonSave = (Button) findViewById(R.id.bt_save);
         mButtonSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Save all preferences
                 savePreferences();
+                // Update config from preferences
+                FXWedgeStaticConfig.getFromSharedPreferences(FXWedgeSetupActivity.this);
+                Toast.makeText(FXWedgeSetupActivity.this, "Config saved", Toast.LENGTH_SHORT).show();
+
             }
         });
+
+        mButtonGetLocation = (Button) findViewById(R.id.bt_getlocation);
+        mButtonGetLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateLocationFused();
+            }
+        });
+
+        mButtonExportConfig = (Button) findViewById(R.id.bt_export);
+        mButtonExportConfig.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                File path = getExternalFilesDir(null);
+                File filePath = new File(path, "config.json");
+                try {
+                    boolean result = FXWedgeStaticConfig.writeConfig(FXWedgeSetupActivity.this, filePath.getPath());
+                    if (result) {
+                        Toast.makeText(FXWedgeSetupActivity.this, "Config exported successfully", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(FXWedgeSetupActivity.this, "Error trying to export configuration", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Toast.makeText(FXWedgeSetupActivity.this, "Error trying to export configuration:\n" + e.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+        mButtonImportConfig = (Button) findViewById(R.id.bt_import);
+        mButtonImportConfig.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                File path = getExternalFilesDir(null);
+                File filePath = new File(path, "config.json");
+                try {
+                    boolean result = FXWedgeStaticConfig.readConfig(FXWedgeSetupActivity.this, filePath.getPath());
+                    if (result) {
+                        Toast.makeText(FXWedgeSetupActivity.this, "Config imported successfully", Toast.LENGTH_SHORT).show();
+                        updateUIElements();
+                        updateUglyStatics();
+                    } else {
+                        Toast.makeText(FXWedgeSetupActivity.this, "Error trying to import configuration", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Toast.makeText(FXWedgeSetupActivity.this, "Error trying to import configuration:\n" + e.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+        mButtonDeleteConfig = (Button) findViewById(R.id.bt_delete);
+        mButtonDeleteConfig.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                File path = getFilesDir();
+                File filePath = new File(path, "config.json");
+                if(filePath.exists())
+                    filePath.delete();
+                Toast.makeText(FXWedgeSetupActivity.this, "Config file deleted successfully.", Toast.LENGTH_SHORT).show();
+            }
+        });
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult == null) {
+                    return;
+                }
+                for (Location location : locationResult.getLocations()) {
+                    // Update UI with location data
+                    // ...
+                    final Location flocation = location;
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mDeviceLatitude.setText(String.valueOf(flocation.getLatitude()));
+                            mDeviceLongitude.setText(String.valueOf(flocation.getLongitude()));
+                            stopLocationUpdates();
+                        }
+                    });
+                    break;
+                }
+            }
+        };
+    }
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        stopLocationUpdates();
+    }
+
+    @SuppressLint("MissingPermission")
+    private void startLocationUpdates() {
+        if(locationRequest == null) {
+            locationRequest = LocationRequest.create();
+            locationRequest.setInterval(5000);
+            locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+            fusedLocationClient.requestLocationUpdates(locationRequest,
+                    locationCallback,
+                    Looper.getMainLooper());
+        }
+    }
+
+    private void stopLocationUpdates() {
+        fusedLocationClient.removeLocationUpdates(locationCallback);
+        locationRequest = null;
+    }
+
+    private void updateUIElements() {
+        mFXName.setText(FXWedgeStaticConfig.mFXName);
+        mFXIPTextView.setText(FXWedgeStaticConfig.mFXIp);
+        mServerPortTextView.setText(String.valueOf(FXWedgeStaticConfig.mServerPort));
+        setAutoStartServiceOnBootSwitch(FXWedgeStaticConfig.mStartServiceOnBoot);
+        mFXLogin.setText(FXWedgeStaticConfig.mFXLogin);
+        mFXPassword.setText(FXWedgeStaticConfig.mFXPassword);
+
+        mEnableForwarding.setChecked(FXWedgeStaticConfig.mEnableForwarding);
+
+        mForwardIP.setText(FXWedgeStaticConfig.mForwardIP);
+
+        mForwardPort.setText(String.valueOf(FXWedgeStaticConfig.mForwardPort));
+
+        mEnableIOTAForwarding.setChecked(FXWedgeStaticConfig.mEnableIOTAForwarding);
+        mIOTAForwardingAPIKey.setText(FXWedgeStaticConfig.mIOTAForwardingKey);
+
+        mIOTAForwardingEndpoint.setText(FXWedgeStaticConfig.mIOTAForwardingEndPoint);
+
+        mDeviceLatitude.setText(String.valueOf(FXWedgeStaticConfig.mDeviceLatitude));
+
+        mDeviceLongitude.setText(String.valueOf(FXWedgeStaticConfig.mDeviceLongitude));
+    }
+
+    @SuppressLint("MissingPermission")
+    private void updateLocationFused()
+    {
+        if(fusedLocationClient != null) {
+            fusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            // Got last known location. In some rare situations this can be null.
+                            if (location != null) {
+                                final Location flocation = location;
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        mDeviceLatitude.setText(String.valueOf(flocation.getLatitude()));
+                                        mDeviceLongitude.setText(String.valueOf(flocation.getLongitude()));
+                                    }
+                                });
+                            }
+                            else
+                            {
+                                startLocationUpdates();
+                            }
+                        }
+                    });
+        }
     }
 
     private void savePreferences()
     {
-        SharedPreferences sharedpreferences = getSharedPreferences(RESTHostServiceConstants.SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedpreferences.edit();
-        editor.putBoolean(RESTHostServiceConstants.SHARED_PREFERENCES_START_SERVICE_ON_BOOT, mAutoStartServiceOnBootSwitch.isChecked());
-        editor.putString(RESTHostServiceConstants.SHARED_PREFERENCES_FX_NAME, mFXName.getText().toString());
-        editor.putString(RESTHostServiceConstants.SHARED_PREFERENCES_FX_IP, mFXIPTextView.getText().toString());
-        editor.putString(RESTHostServiceConstants.SHARED_PREFERENCES_FX_LOGIN, mFXLogin.getText().toString());
-        editor.putString(RESTHostServiceConstants.SHARED_PREFERENCES_FX_PASSWORD, mFXPassword.getText().toString());
-        editor.putString(RESTHostServiceConstants.SHARED_PREFERENCES_FORWARDING_IP, mForwardIP.getText().toString());
-        int forwardPort = Integer.valueOf(mForwardPort.getText().toString());
-        editor.putInt(RESTHostServiceConstants.SHARED_PREFERENCES_FORWARDING_PORT, forwardPort);
-        editor.putBoolean(RESTHostServiceConstants.SHARED_PREFERENCES_FORWARDING_ENABLED, mEnableForwarding.isChecked());
-        int serverPort = Integer.valueOf(mServerPortTextView.getText().toString());
-        editor.putInt(RESTHostServiceConstants.SHARED_PREFERENCES_SERVER_PORT, serverPort);
-        editor.putString(RESTHostServiceConstants.SHARED_PREFERENCES_IOTAFORWARDING_ENDPOINT, mIOTAForwardingEndpoint.getText().toString());
-        editor.putBoolean(RESTHostServiceConstants.SHARED_PREFERENCES_IOTAFORWARDING_ENABLED, mEnableIOTAForwarding.isChecked());
-        editor.putString(RESTHostServiceConstants.SHARED_PREFERENCES_IOTAFORWARDING_APIKEY, mIOTAForwardingAPIKey.getText().toString());
-        editor.commit();
-        Toast.makeText(FXWedgeSetupActivity.this, getString(R.string.configsaved), Toast.LENGTH_SHORT).show();
         updateUglyStatics();
+        FXWedgeStaticConfig.storeInSharedPreferences(this);
     }
 
     private void updateUglyStatics()
     {
-        RESTServiceWebServer.mFXIp = mFXIPTextView.getText().toString();
-        RESTServiceWebServer.mServerPort = Integer.valueOf(mServerPortTextView.getText().toString());;
-        RestServiceFXEndPoint.mForwardIP = mForwardIP.getText().toString();
-        RestServiceFXEndPoint.mForwardPort = Integer.valueOf(mForwardPort.getText().toString());;
-        RestServiceFXEndPoint.mEnableForwarding = mEnableForwarding.isChecked();
-        RestServiceFXEndPoint.mEnableIOTAForwarding = mEnableIOTAForwarding.isChecked();
-        RestServiceFXEndPoint.mIOTAForwardingKey = mIOTAForwardingAPIKey.getText().toString();
-        RestServiceFXEndPoint.mIOTAForwardingEndPoint = mIOTAForwardingEndpoint.getText().toString();
+        FXWedgeStaticConfig.mFXIp = mFXIPTextView.getText().toString();
+        FXWedgeStaticConfig.mServerPort = Integer.valueOf(mServerPortTextView.getText().toString());;
+        FXWedgeStaticConfig.mForwardIP = mForwardIP.getText().toString();
+        FXWedgeStaticConfig.mForwardPort = Integer.valueOf(mForwardPort.getText().toString());;
+        FXWedgeStaticConfig.mEnableForwarding = mEnableForwarding.isChecked();
+        FXWedgeStaticConfig.mEnableIOTAForwarding = mEnableIOTAForwarding.isChecked();
+        FXWedgeStaticConfig.mIOTAForwardingKey = mIOTAForwardingAPIKey.getText().toString();
+        FXWedgeStaticConfig.mIOTAForwardingEndPoint = mIOTAForwardingEndpoint.getText().toString();
+        FXWedgeStaticConfig.mDeviceLatitude = Double.valueOf(mDeviceLatitude.getText().toString());
+        FXWedgeStaticConfig.mDeviceLongitude = Double.valueOf(mDeviceLongitude.getText().toString());
         try {
-            RestServiceFXEndPoint.mFXNameEncoded = URLEncoder.encode(mFXName.getText().toString(),"UTF-8");
+            FXWedgeStaticConfig.mFXNameEncoded = URLEncoder.encode(mFXName.getText().toString(),"UTF-8");
         } catch (UnsupportedEncodingException e) {
-            RestServiceFXEndPoint.mFXNameEncoded = "";
+            FXWedgeStaticConfig.mFXNameEncoded = "";
         }
     }
 
@@ -226,7 +364,7 @@ public class FXWedgeSetupActivity extends AppCompatActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mFXIPTextView.setText(RESTServiceWebServer.mFXIp);
+                mFXIPTextView.setText(FXWedgeStaticConfig.mFXIp);
             }
         });
 
@@ -243,7 +381,7 @@ public class FXWedgeSetupActivity extends AppCompatActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mServerPortTextView.setText(RESTServiceWebServer.mServerPort);
+                mServerPortTextView.setText(FXWedgeStaticConfig.mServerPort);
             }
         });
     }
@@ -296,7 +434,7 @@ public class FXWedgeSetupActivity extends AppCompatActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mForwardIP.setText(RestServiceFXEndPoint.mForwardIP);
+                mForwardIP.setText(FXWedgeStaticConfig.mForwardIP);
             }
         });
 
@@ -313,7 +451,7 @@ public class FXWedgeSetupActivity extends AppCompatActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mForwardPort.setText(String.valueOf(RestServiceFXEndPoint.mForwardPort));
+                mForwardPort.setText(String.valueOf(FXWedgeStaticConfig.mForwardPort));
             }
         });
     }
@@ -330,7 +468,7 @@ public class FXWedgeSetupActivity extends AppCompatActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mEnableForwarding.setChecked(RestServiceFXEndPoint.mEnableForwarding);
+                mEnableForwarding.setChecked(FXWedgeStaticConfig.mEnableForwarding);
             }
         });
     }
@@ -348,7 +486,7 @@ public class FXWedgeSetupActivity extends AppCompatActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mEnableIOTAForwarding.setChecked(RestServiceFXEndPoint.mEnableIOTAForwarding);
+                mEnableIOTAForwarding.setChecked(FXWedgeStaticConfig.mEnableIOTAForwarding);
             }
         });
     }
@@ -366,7 +504,7 @@ public class FXWedgeSetupActivity extends AppCompatActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mIOTAForwardingAPIKey.setText(RestServiceFXEndPoint.mIOTAForwardingKey);
+                mIOTAForwardingAPIKey.setText(FXWedgeStaticConfig.mIOTAForwardingKey);
             }
         });
     }
@@ -384,10 +522,40 @@ public class FXWedgeSetupActivity extends AppCompatActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mIOTAForwardingEndpoint.setText(RestServiceFXEndPoint.mIOTAForwardingEndPoint);
+                mIOTAForwardingEndpoint.setText(FXWedgeStaticConfig.mIOTAForwardingEndPoint);
             }
         });
     }
 
+    public static void updateIOTALatitudeIfNecessary() {
+        if(FXWedgeSetupActivity.mMainActivity != null) // The application default activity has been opened
+        {
+            FXWedgeSetupActivity.mMainActivity.updateEnableIOTALatitude();
+        }
+    }
 
+    private void updateEnableIOTALatitude() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mDeviceLatitude.setText(String.valueOf(FXWedgeStaticConfig.mDeviceLatitude));
+            }
+        });
+    }
+
+    public static void updateIOTALongitudeIfNecessary() {
+        if(FXWedgeSetupActivity.mMainActivity != null) // The application default activity has been opened
+        {
+            FXWedgeSetupActivity.mMainActivity.updateEnableIOTALongitude();
+        }
+    }
+
+    private void updateEnableIOTALongitude() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mDeviceLongitude.setText(String.valueOf(FXWedgeStaticConfig.mDeviceLongitude));
+            }
+        });
+    }
 }

@@ -33,8 +33,8 @@ public class IOTAHelpers {
         public String timestamp;
         public static class location
         {
-            public double longitude;
-            public double latitude;
+            public float longitude;
+            public float latitude;
         }
         public location location;
         public static class jsonData
@@ -57,10 +57,10 @@ public class IOTAHelpers {
            epc = data.data.idHex;
            timestamp = dateFormat.format(data.timestamp);
            location = new location();
-           location.latitude = -30.215115;
-           location.longitude = -25.215115;
+           location.latitude = -30.215115f;
+           location.longitude = -25.215115f;
            jsonData = new jsonData();
-           jsonData.deviceSerialNumber = ZebraDeviceHelper.mDeviceSerialNumber;
+           jsonData.deviceSerialNumber = FXWedgeStaticConfig.mDeviceSerialNumber;
         }};
         // TODO: Create the correct JSON structure for IOTA
         String iotaDataJSON = new Gson().toJson(iotaData, IOTAData.class);

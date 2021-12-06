@@ -19,6 +19,8 @@ public class RESTHostServiceConstants {
     protected static final String SHARED_PREFERENCES_IOTAFORWARDING_ENABLED = "iotaforwardingenabled";
     protected static final String SHARED_PREFERENCES_IOTAFORWARDING_APIKEY = "iotaforwardingapikey";
     protected static final String SHARED_PREFERENCES_IOTAFORWARDING_ENDPOINT = "iotaforwardingendpoint";
+    protected static final String SHARED_PREFERENCES_IOTAFORWARDING_LATITUDE = "iotaforwardinglatitude";
+    protected static final String SHARED_PREFERENCES_IOTAFORWARDING_LONGITUDE = "iotaforwardinglongitude";
 
     // Intent settings xtras keys
     protected static final String EXTRA_CONFIGURATION_START_ON_BOOT = "startonboot";
@@ -33,6 +35,8 @@ public class RESTHostServiceConstants {
     protected static final String EXTRA_CONFIGURATION_SET_IOTAFORWARDING_ENABLED = "iotaforwardingenabled";
     protected static final String EXTRA_CONFIGURATION_SET_IOTAFORWARDING_APIKEY = "iotaforwardingapikey";
     protected static final String EXTRA_CONFIGURATION_SET_IOTAFORWARDING_ENDPOINT = "iotaforwardingendpoint";
+    protected static final String EXTRA_CONFIGURATION_SET_IOTAFORWARDING_LATITUDE = "iotaforwardinglatitude";
+    protected static final String EXTRA_CONFIGURATION_SET_IOTAFORWARDING_LONGITUDE = "iotaforwardinglongitude";
 
     // Server configuration
     protected static final String SERVER_CORS_ALLOWED_METHODS = "GET, POST, PUT, DELETE, OPTIONS, HEAD";

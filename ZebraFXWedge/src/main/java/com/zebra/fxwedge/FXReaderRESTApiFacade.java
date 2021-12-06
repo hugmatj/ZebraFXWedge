@@ -1,7 +1,6 @@
 package com.zebra.fxwedge;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -382,7 +381,7 @@ public class FXReaderRESTApiFacade {
                 "                {\n" +
                 "                    \"type\": \"httpPost\",\n" +
                 "                    \"options\": {\n" +
-                "                        \"URL\": \"http://" + RESTServiceWebServer.mCurrentIP + ":" + String.valueOf(RESTServiceWebServer.mServerPort) + "\",\n" +
+                "                        \"URL\": \"http://" + FXWedgeStaticConfig.mCurrentIP + ":" + String.valueOf(FXWedgeStaticConfig.mServerPort) + "\",\n" +
                 "                        \"security\": {\n" +
                 "                            \"verifyPeer\": false,\n" +
                 "                            \"verifyHost\": false,\n" +

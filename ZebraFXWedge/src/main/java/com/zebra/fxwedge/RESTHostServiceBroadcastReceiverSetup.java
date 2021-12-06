@@ -34,7 +34,7 @@ public class RESTHostServiceBroadcastReceiverSetup extends BroadcastReceiver {
             Log.d(RESTHostServiceConstants.TAG, "RESTHostServiceBroadcastReceiverSetup::onReceive:Set FX IP extra found with value:" + setFxIP);
             setSharedPreference(context, RESTHostServiceConstants.SHARED_PREFERENCES_FX_IP, setFxIP);
             // Update rest server if launched
-            RESTServiceWebServer.mFXIp = setFxIP;
+            FXWedgeStaticConfig.mFXIp = setFxIP;
             // Update GUI if necessary
             FXWedgeSetupActivity.updateFxIPIfNecessary();
         }
@@ -50,7 +50,7 @@ public class RESTHostServiceBroadcastReceiverSetup extends BroadcastReceiver {
             int serverPort = Integer.valueOf(setServerPort);
             setSharedPreference(context, RESTHostServiceConstants.SHARED_PREFERENCES_SERVER_PORT, serverPort);
             // Update rest server if launched
-            RESTServiceWebServer.mServerPort = serverPort;
+            FXWedgeStaticConfig.mServerPort = serverPort;
             // Update GUI if necessary
             FXWedgeSetupActivity.updateServerPortIfNecessary();
         }
@@ -110,7 +110,7 @@ public class RESTHostServiceBroadcastReceiverSetup extends BroadcastReceiver {
             Log.d(RESTHostServiceConstants.TAG, "RESTHostServiceBroadcastReceiverSetup::onReceive:Set Forward IP extra found with value:" + setForwardIP);
             setSharedPreference(context, RESTHostServiceConstants.SHARED_PREFERENCES_FORWARDING_IP, setForwardIP);
             // Update rest server if launched
-            RestServiceFXEndPoint.mForwardIP = setForwardIP;
+            FXWedgeStaticConfig.mForwardIP = setForwardIP;
             // Update GUI if necessary
             FXWedgeSetupActivity.updateForwardIPIfNecessary();
         }
@@ -126,7 +126,7 @@ public class RESTHostServiceBroadcastReceiverSetup extends BroadcastReceiver {
             int forwardPort = Integer.valueOf(setForwardPort);
             setSharedPreference(context, RESTHostServiceConstants.SHARED_PREFERENCES_FORWARDING_PORT, forwardPort);
             // Update rest server if launched
-            RestServiceFXEndPoint.mForwardPort = forwardPort;
+            FXWedgeStaticConfig.mForwardPort = forwardPort;
             // Update GUI if necessary
             FXWedgeSetupActivity.updateForwardPortIfNecessary();
         }
@@ -143,7 +143,7 @@ public class RESTHostServiceBroadcastReceiverSetup extends BroadcastReceiver {
             boolean enableForward = Boolean.valueOf(setEnableForward);
             setSharedPreference(context, RESTHostServiceConstants.SHARED_PREFERENCES_FORWARDING_ENABLED, enableForward);
             // Update rest server if launched
-            RestServiceFXEndPoint.mEnableForwarding = enableForward;
+            FXWedgeStaticConfig.mEnableForwarding = enableForward;
             // Update GUI if necessary
             FXWedgeSetupActivity.updateEnableForwardIfNecessary();
         }
@@ -159,7 +159,7 @@ public class RESTHostServiceBroadcastReceiverSetup extends BroadcastReceiver {
             boolean enableIOTAForward = Boolean.valueOf(setEnableIOTAForward);
             setSharedPreference(context, RESTHostServiceConstants.SHARED_PREFERENCES_IOTAFORWARDING_ENABLED, enableIOTAForward);
             // Update rest server if launched
-            RestServiceFXEndPoint.mEnableIOTAForwarding = enableIOTAForward;
+            FXWedgeStaticConfig.mEnableIOTAForwarding = enableIOTAForward;
             // Update GUI if necessary
             FXWedgeSetupActivity.updateEnableIOTAForwardIfNecessary();
         }
@@ -174,7 +174,7 @@ public class RESTHostServiceBroadcastReceiverSetup extends BroadcastReceiver {
             Log.d(RESTHostServiceConstants.TAG, "RESTHostServiceBroadcastReceiverSetup::onReceive:Set IOTA Forward API Key extra found with value:" + setIOTAForwardAPIKey);
             setSharedPreference(context, RESTHostServiceConstants.SHARED_PREFERENCES_IOTAFORWARDING_APIKEY, setIOTAForwardAPIKey);
             // Update rest server if launched
-            RestServiceFXEndPoint.mIOTAForwardingKey = setIOTAForwardAPIKey;
+            FXWedgeStaticConfig.mIOTAForwardingKey = setIOTAForwardAPIKey;
             // Update GUI if necessary
             FXWedgeSetupActivity.updateIOTAApiKeyIfNecessary();
         }
@@ -189,13 +189,47 @@ public class RESTHostServiceBroadcastReceiverSetup extends BroadcastReceiver {
             Log.d(RESTHostServiceConstants.TAG, "RESTHostServiceBroadcastReceiverSetup::onReceive:Set IOTA Forward Endpoint extra found with value:" + setIOTAForwardEndPoint);
             setSharedPreference(context, RESTHostServiceConstants.SHARED_PREFERENCES_IOTAFORWARDING_ENDPOINT, setIOTAForwardEndPoint);
             // Update rest server if launched
-            RestServiceFXEndPoint.mIOTAForwardingEndPoint = setIOTAForwardEndPoint;
+            FXWedgeStaticConfig.mIOTAForwardingEndPoint = setIOTAForwardEndPoint;
             // Update GUI if necessary
             FXWedgeSetupActivity.updateIOTAEndPointIfNecessary();
         }
         else
         {
             Log.d(RESTHostServiceConstants.TAG, "RESTHostServiceBroadcastReceiverSetup::onReceive:No IOTA forward Endpoint extra found.");
+        }
+
+        String setIOTAForwardLatitude = intent.getExtras().getString(RESTHostServiceConstants.EXTRA_CONFIGURATION_SET_IOTAFORWARDING_LATITUDE, null);
+        if(setIOTAForwardLatitude != null)
+        {
+            Log.d(RESTHostServiceConstants.TAG, "RESTHostServiceBroadcastReceiverSetup::onReceive:Set IOTA Forward Latitude extra found with value:" + setIOTAForwardLatitude);
+            double deviceLatitude = Double.valueOf(setIOTAForwardLatitude);
+            if(deviceLatitude != 0)
+                setSharedPreference(context, RESTHostServiceConstants.SHARED_PREFERENCES_IOTAFORWARDING_LATITUDE, setIOTAForwardLatitude);
+            // Update rest server if launched
+            FXWedgeStaticConfig.mDeviceLatitude = deviceLatitude;
+            // Update GUI if necessary
+            FXWedgeSetupActivity.updateIOTALatitudeIfNecessary();
+        }
+        else
+        {
+            Log.d(RESTHostServiceConstants.TAG, "RESTHostServiceBroadcastReceiverSetup::onReceive:No IOTA forward Latitude extra found.");
+        }
+        
+        String setIOTAForwardLongitude = intent.getExtras().getString(RESTHostServiceConstants.EXTRA_CONFIGURATION_SET_IOTAFORWARDING_LONGITUDE, null);
+        if(setIOTAForwardLongitude != null)
+        {
+            Log.d(RESTHostServiceConstants.TAG, "RESTHostServiceBroadcastReceiverSetup::onReceive:Set IOTA Forward Longitude extra found with value:" + setIOTAForwardLongitude);
+            double deviceLongitude = Double.valueOf(setIOTAForwardLongitude);
+            if(deviceLongitude != 0)
+                setSharedPreference(context, RESTHostServiceConstants.EXTRA_CONFIGURATION_SET_IOTAFORWARDING_LONGITUDE, setIOTAForwardLongitude);
+            // Update rest server if launched
+            FXWedgeStaticConfig.mDeviceLongitude = deviceLongitude;
+            // Update GUI if necessary
+            FXWedgeSetupActivity.updateIOTALongitudeIfNecessary();
+        }
+        else
+        {
+            Log.d(RESTHostServiceConstants.TAG, "RESTHostServiceBroadcastReceiverSetup::onReceive:No IOTA forward Longitude extra found.");
         }
     }
 
@@ -206,6 +240,16 @@ public class RESTHostServiceBroadcastReceiverSetup extends BroadcastReceiver {
         SharedPreferences sharedpreferences = context.getSharedPreferences(RESTHostServiceConstants.SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedpreferences.edit();
         editor.putBoolean(key, value);
+        editor.commit();
+    }
+    
+    private void setSharedPreference(Context context, String key, float value)
+    {
+        Log.d(RESTHostServiceConstants.TAG, "RESTHostServiceBroadcastReceiverSetup::setSharedPreference: Key=" + key + " | Value=" + value);
+        // Setup shared preferences for next reboot
+        SharedPreferences sharedpreferences = context.getSharedPreferences(RESTHostServiceConstants.SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedpreferences.edit();
+        editor.putFloat(key, value);
         editor.commit();
     }
 

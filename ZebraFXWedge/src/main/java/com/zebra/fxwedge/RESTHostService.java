@@ -15,6 +15,9 @@ import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.IOException;
+
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
@@ -93,6 +96,8 @@ public class RESTHostService extends Service {
             notificationBuilder.setContentIntent(localTaskStackBuilder.getPendingIntent(0, FLAG_UPDATE_CURRENT));
 
             if(isZebraDevice) {
+                // Initialize configuration
+                initializeConfiguration(this);
                 // Start foreground service
                 startForeground(SERVICE_ID, mNotification);
 
@@ -103,7 +108,7 @@ public class RESTHostService extends Service {
                     mRESTServer = null;
                 }
 
-                mRESTServer = new RESTServiceWebServer(RESTServiceWebServer.mServerPort, getBaseContext());
+                mRESTServer = new RESTServiceWebServer(FXWedgeStaticConfig.mServerPort, getBaseContext());
                 mRESTServer.start(-1);
                 logD("startService:Service started without error.");
             }
@@ -122,6 +127,32 @@ public class RESTHostService extends Service {
             logD("startService:Error while starting service.");
             e.printStackTrace();
         }
+    }
+
+    private void initializeConfiguration(Context context)
+    {
+        // Check if a config file exists
+        File path = getExternalFilesDir(null);
+        File filePath = new File(path, "config.json");
+
+        if(filePath.exists())
+        {
+            Log.d(FXWedgeStaticConfig.TAG, "Config file found at: " + filePath.getPath());
+            // A config file exists, in that case, we force the settings
+            try {
+                FXWedgeStaticConfig.readConfig(context, filePath.getPath());
+            } catch (IOException e) {
+                Log.d(FXWedgeStaticConfig.TAG, "Error while trying to open config file. Contact your administrator.");
+                Toast.makeText(context, "FXWedge Service : Error while trying to open config file. Contact your administrator.", Toast.LENGTH_LONG).show();
+                e.printStackTrace();
+                FXWedgeStaticConfig.getFromSharedPreferences(this);
+            }
+        }
+        else {
+            // Update statics values from preferences
+            FXWedgeStaticConfig.getFromSharedPreferences(this);
+        }
+
     }
 
     private void stopService()

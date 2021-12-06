@@ -26,31 +26,11 @@ import okhttp3.Response;
 
 public class RestServiceFXEndPoint implements RESTServiceInterface{
     private Context mContext = null;
-    public static String mForwardIP = "sms.ckpfra.ovh";
-    public static int mForwardPort = 1706;
-    public static boolean mEnableForwarding = false;
-    public static String mFXNameEncoded = "";
-
-    public static boolean mEnableIOTAForwarding = false;
-    public static String mIOTAForwardingKey = "EbJbpyTL9C1oBXTYy5GxWhKk8AKNSM4n";
-    public static String mIOTAForwardingEndPoint = "https://sandbox-api.zebra.com/v2/ledger/tangle";
 
     protected static String TAG = "FXEP";
 
     public RestServiceFXEndPoint(Context context) {
         mContext = context;
-        SharedPreferences sharedpreferences = context.getSharedPreferences(RESTHostServiceConstants.SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
-        mEnableForwarding = sharedpreferences.getBoolean(RESTHostServiceConstants.SHARED_PREFERENCES_FORWARDING_ENABLED, false);
-        mForwardIP = sharedpreferences.getString(RESTHostServiceConstants.SHARED_PREFERENCES_FORWARDING_IP, "sms.ckpfra.ovh");
-        mForwardPort = sharedpreferences.getInt(RESTHostServiceConstants.SHARED_PREFERENCES_FORWARDING_PORT, 1706);
-        try {
-            mFXNameEncoded = URLEncoder.encode(sharedpreferences.getString(RESTHostServiceConstants.SHARED_PREFERENCES_FX_NAME, "FX7500"),"UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            mFXNameEncoded = "";
-        }
-        mEnableIOTAForwarding = sharedpreferences.getBoolean(RESTHostServiceConstants.SHARED_PREFERENCES_IOTAFORWARDING_ENABLED, false);
-        mIOTAForwardingKey = sharedpreferences.getString(RESTHostServiceConstants.SHARED_PREFERENCES_IOTAFORWARDING_APIKEY, "EbJbpyTL9C1oBXTYy5GxWhKk8AKNSM4n");
-        mIOTAForwardingEndPoint = sharedpreferences.getString(RESTHostServiceConstants.SHARED_PREFERENCES_IOTAFORWARDING_ENDPOINT, "https://sandbox-api.zebra.com/v2/ledger/tangle");
     }
 
     @Override
@@ -80,11 +60,11 @@ public class RestServiceFXEndPoint implements RESTServiceInterface{
             if(json.isEmpty() == false)
                 broadcastJSONData(session, json);
 
-            if(mEnableForwarding )
+            if(FXWedgeStaticConfig.mEnableForwarding )
                 forwardSession(session, files);
 
-            if(mEnableIOTAForwarding)
-                IOTAHelpers.forwardSessionToIOTA(session, files, mIOTAForwardingEndPoint, mIOTAForwardingKey);
+            if(FXWedgeStaticConfig.mEnableIOTAForwarding)
+                IOTAHelpers.forwardSessionToIOTA(session, files, FXWedgeStaticConfig.mIOTAForwardingEndPoint, FXWedgeStaticConfig.mIOTAForwardingKey);
             //Log.w(TAG, "json " + json);
         }
 
@@ -114,14 +94,14 @@ public class RestServiceFXEndPoint implements RESTServiceInterface{
         RequestBody body = RequestBody.create(postData, mediaType);
 
         Request.Builder okHttpBuilder = new Request.Builder();
-        okHttpBuilder = okHttpBuilder.url("http://" + mForwardIP + ":" + String.valueOf(mForwardPort) + "");
+        okHttpBuilder = okHttpBuilder.url("http://" + FXWedgeStaticConfig.mForwardIP + ":" + String.valueOf(FXWedgeStaticConfig.mForwardPort) + "");
         okHttpBuilder = okHttpBuilder.method(session.getMethod().name(), body);
 
         okHttpBuilder = okHttpBuilder.addHeader("remote-addr", session.getRemoteIpAddress());
         okHttpBuilder = okHttpBuilder.addHeader("remote-host", session.getRemoteHostName());
         okHttpBuilder = okHttpBuilder.addHeader("http-client-ip", session.getRemoteIpAddress());
-        okHttpBuilder = okHttpBuilder.addHeader("host", mForwardIP + ":" + String.valueOf(mForwardPort));
-        okHttpBuilder = okHttpBuilder.addHeader("fxforward", mFXNameEncoded);
+        okHttpBuilder = okHttpBuilder.addHeader("host", FXWedgeStaticConfig.mForwardIP + ":" + String.valueOf(FXWedgeStaticConfig.mForwardPort));
+        okHttpBuilder = okHttpBuilder.addHeader("fxforward", FXWedgeStaticConfig.mFXNameEncoded);
         okHttpBuilder = okHttpBuilder.addHeader("accept", "*/*");
 
         request = okHttpBuilder.build();

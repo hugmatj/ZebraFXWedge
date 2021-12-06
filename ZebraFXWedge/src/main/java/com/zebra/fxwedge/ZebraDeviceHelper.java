@@ -7,7 +7,6 @@ import android.os.Build;
 import android.util.Log;
 
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 import com.zebra.deviceidentifierswrapper.DIHelper;
 import com.zebra.deviceidentifierswrapper.IDIResultCallbacks;
@@ -15,10 +14,11 @@ import com.zebra.deviceidentifierswrapper.IDIResultCallbacks;
 public class ZebraDeviceHelper {
     public static String TAG = "ZDeviceHelper";
 
-    public static String mDeviceSerialNumber = "";
-
     public static boolean isZebraDevice(Context context)
     {
+        if(Build.MANUFACTURER.contains("Zebra"))
+            return true;
+        /*
         final PackageManager pm = context.getPackageManager();
         //get a list of installed apps.
         List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
@@ -29,6 +29,7 @@ public class ZebraDeviceHelper {
             Build.MANUFACTURER.contains("Zebra"))
                 return true;
         }
+         */
         return false;
     }
 
@@ -39,22 +40,22 @@ public class ZebraDeviceHelper {
 
     public static void getDeviceSerialNumber(Context context, final getDeviceSerialCallback getDeviceSerialCallback)
     {
-        if(mDeviceSerialNumber.isEmpty()) {
+        if(FXWedgeStaticConfig.mDeviceSerialNumber.isEmpty()) {
             DIHelper.getSerialNumber(context, new IDIResultCallbacks() {
                 @Override
                 public void onSuccess(String message) {
                     // The message contains the serial number
-                    mDeviceSerialNumber = message;
+                    FXWedgeStaticConfig.mDeviceSerialNumber = message;
                     if(getDeviceSerialCallback != null)
                     {
-                        getDeviceSerialCallback.onSerialNumberRetrieved(mDeviceSerialNumber);
+                        getDeviceSerialCallback.onSerialNumberRetrieved(FXWedgeStaticConfig.mDeviceSerialNumber);
                     }
                 }
 
                 @Override
                 public void onError(String message) {
                     // An error occurred
-                    mDeviceSerialNumber = "SN Error";
+                    FXWedgeStaticConfig.mDeviceSerialNumber = "SN Error";
                     if(getDeviceSerialCallback != null)
                     {
                         getDeviceSerialCallback.onSerialNumberRetrieved("SN Error");

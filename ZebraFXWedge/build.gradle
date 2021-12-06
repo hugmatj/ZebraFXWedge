@@ -1,12 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
 
     defaultConfig {
         applicationId "com.zebra.fxwedge"
         minSdkVersion 26
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode 3
         versionName "1.2"
 
@@ -42,4 +42,7 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.8'
     //implementation 'com.google.code.gson:gson:+'
     implementation("com.squareup.okhttp3:okhttp:4.9.1")
+    //implementation 'com.github.quentin7b:android-location-tracker:4.0'
+    implementation 'com.google.android.gms:play-services-location:18.0.0'
+    implementation 'com.github.pankaj89:PermissionHelper:2.3'
 }

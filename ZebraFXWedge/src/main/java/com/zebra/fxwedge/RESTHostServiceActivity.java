@@ -1,9 +1,12 @@
 package com.zebra.fxwedge;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Environment;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,6 +17,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.master.permissionhelper.PermissionHelper;
 import com.zebra.deviceidentifierswrapper.DIHelper;
 import com.zebra.deviceidentifierswrapper.IDIResultCallbacks;
 
@@ -66,9 +70,13 @@ public class RESTHostServiceActivity extends AppCompatActivity {
     protected static RESTHostServiceActivity mMainActivity;
     private RESTHostServiceNetworkStateObserver mIPChangeObserver = null;
 
+    private final static String TAG = "FXWedgeActivity";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        checkPermissions();
 
         if(ZebraDeviceHelper.isZebraDevice(this) == false)
         {
@@ -112,6 +120,38 @@ public class RESTHostServiceActivity extends AppCompatActivity {
 
     }
 
+    private void checkPermissions() {
+        PermissionHelper permissionHelper = new PermissionHelper(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 100);
+        permissionHelper.request(new PermissionHelper.PermissionCallback() {
+            @Override
+            public void onPermissionGranted() {
+                Log.d(TAG, "onPermissionGranted() called");
+                // TODO: MANAGE ALL FILES ON API 30
+                /*
+                    if(Environment.isExternalStorageManager() == false)
+                    {
+
+                    }
+                */
+            }
+
+            @Override
+            public void onIndividualPermissionGranted(String[] grantedPermission) {
+                Log.d(TAG, "onIndividualPermissionGranted() called with: grantedPermission = [" + TextUtils.join(",",grantedPermission) + "]");
+            }
+
+            @Override
+            public void onPermissionDenied() {
+                Log.d(TAG, "onPermissionDenied() called");
+            }
+
+            @Override
+            public void onPermissionDeniedBySystem() {
+                Log.d(TAG, "onPermissionDeniedBySystem() called");
+            }
+        });
+    }
+
     @Override
     protected void onResume() {
         if(ZebraDeviceHelper.isZebraDevice(this)) {
@@ -145,7 +185,7 @@ public class RESTHostServiceActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         mDeviceSerialNumber.setText("Device Serial: " + fMessage);
-                        ZebraDeviceHelper.mDeviceSerialNumber = fMessage;
+                        FXWedgeStaticConfig.mDeviceSerialNumber = fMessage;
                     }
                 });
             }
@@ -162,7 +202,7 @@ public class RESTHostServiceActivity extends AppCompatActivity {
 
             @Override
             public void onDebugStatus(String message) {
-
+                Log.d(TAG, message);
             }
         });
 
