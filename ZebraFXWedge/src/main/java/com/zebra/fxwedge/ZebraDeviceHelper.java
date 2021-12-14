@@ -6,7 +6,11 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.util.Log;
 
+import java.net.UnknownHostException;
 import java.util.List;
+
+import java.net.InetAddress;
+import java.io.IOException;
 
 import com.zebra.deviceidentifierswrapper.DIHelper;
 import com.zebra.deviceidentifierswrapper.IDIResultCallbacks;
@@ -78,4 +82,20 @@ public class ZebraDeviceHelper {
             }
         }
     }
+
+    public static boolean PING(String ipAddress)
+    {
+        boolean reachable = false;
+        InetAddress inet = null;
+        try {
+            inet = InetAddress.getByName(ipAddress);
+            reachable = inet.isReachable(5000);
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return reachable ;
+    }
+
 }
