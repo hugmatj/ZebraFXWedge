@@ -41,7 +41,8 @@
             android:name=".RestHostServiceTestActivity"
             android:exported="true" />
         <activity android:name=".LicenceActivity" />
-        <activity android:name=".RESTHostServiceActivity">
+        <activity android:name=".RESTHostServiceActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
